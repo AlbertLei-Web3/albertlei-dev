@@ -16,7 +16,8 @@ import { motion } from "framer-motion";
 export function Hero() {
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-10 md:pt-16">
-      <div className="grid gap-8 md:grid-cols-2 md:items-center">
+      
+      <div className="grid gap-8 md:grid-cols-2 md:items-center relative z-20">
         {/* Left: Text */}
         <motion.div
           initial={{ opacity: 0, y: 18 }}

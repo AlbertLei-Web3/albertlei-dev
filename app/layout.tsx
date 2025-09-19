@@ -9,6 +9,7 @@
  */
 import type { Metadata } from "next";
 import "./globals.css";
+import LiquidEtherBackground from "@/components/LiquidEtherBackground";
 
 export const metadata: Metadata = {
   title: "Albert Lei — Web3 & AI Projects | 赛博霓虹作品集",
@@ -40,9 +41,14 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className="page-bg">
+        {/* 液体效果背景 Liquid Ether Background */}
+        <LiquidEtherBackground />
+        
         {/* 装饰性网格层 Decorative grid layer */}
-        <div className="fixed inset-0 pointer-events-none bg-grid" />
-        <div className="relative min-h-screen">{children}</div>
+        <div className="fixed inset-0 pointer-events-none bg-grid z-10" />
+        
+        {/* 主要内容 Main content */}
+        <div className="relative min-h-screen z-20">{children}</div>
       </body>
     </html>
   );

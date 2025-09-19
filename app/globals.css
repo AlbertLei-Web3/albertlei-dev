@@ -1,4 +1,5 @@
 @import './PillNav.css';
+@import './LiquidEther.css';
 
 @tailwind base;
 @tailwind components;
