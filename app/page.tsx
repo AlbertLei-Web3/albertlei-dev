@@ -44,8 +44,6 @@ export default function HomePage() {
           </div>
           <div className="md:col-span-2">
             <p className="text-white/80">
-              我热衷于用 Web3 与 AI 技术探索新的人机交互方式、价值生产与分配模式，
-              注重从 0 到 1 的产品探索与技术落地。 
               Passionate about Web3 and AI, I explore new HCI patterns and value flows,
               focusing on 0-to-1 product discovery and shipping polished experiences.
             </p>
@@ -56,14 +54,11 @@ export default function HomePage() {
         <section id="projects" className="mt-14">
           <div className="mb-6 flex items-end justify-between">
             <h2 className="neon-text text-xl font-bold">Projects</h2>
-            <span className="text-xs text-white/60">
-              视频自适应，建议 16:9。Videos are responsive, ideally 16:9.
-            </span>
+            <span className="text-xs text-white/60">Videos are responsive, ideally 16:9.</span>
           </div>
 
           {projects.length === 0 ? (
             <div className="glass rounded-xl p-6 text-center text-white/70">
-              尚未添加项目。请在 <code>app/page.tsx</code> 内填充 <code>projects</code> 列表。
               No projects yet. Add items to <code>projects</code> in <code>app/page.tsx</code>.
             </div>
           ) : (

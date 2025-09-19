@@ -24,7 +24,7 @@ export function Footer() {
       <div className="glass flex flex-col items-center gap-3 px-6 py-6 text-center">
         <h4 className="neon-text text-lg font-semibold">Contact</h4>
         <p className="text-white/80">
-          邮箱 Email: <a className="underline decoration-neon-cyan/60" href="mailto:you@domain.com">you@domain.com</a>
+          Email: <a className="underline decoration-neon-cyan/60" href="mailto:you@domain.com">you@domain.com</a>
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
           {[

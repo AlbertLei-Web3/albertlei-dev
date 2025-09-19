@@ -28,12 +28,11 @@ export function Hero() {
           <h1 className="neon-text text-3xl font-extrabold leading-tight md:text-5xl">
             Web3 × AI Developer
             <span className="block text-base text-white/70 md:text-lg">
-              构建去中心化与智能化的下一代产品 Build the next-gen decentralized & intelligent apps
+              Build the next-gen decentralized & intelligent apps
             </span>
           </h1>
 
           <p className="max-w-prose text-white/80">
-            我专注于 Web3 协议、链上应用以及 AI 辅助产品原型设计与实现，注重极致体验与现代视觉语言。 
             Focused on on-chain apps, Web3 protocols, and AI-powered product prototyping with a premium UX and futuristic visuals.
           </p>
 
@@ -61,7 +60,7 @@ export function Hero() {
               className="rounded-md bg-neon-cyan/20 px-4 py-2 text-sm font-medium
                          text-white shadow-neonCyan ring-1 ring-white/10 hover:bg-neon-cyan/30"
             >
-              查看项目 View Projects
+              View Projects
             </motion.a>
 
             <motion.a
@@ -71,7 +70,7 @@ export function Hero() {
               className="rounded-md bg-neon-pink/20 px-4 py-2 text-sm font-medium
                          text-white shadow-neonPink ring-1 ring-white/10 hover:bg-neon-pink/30"
             >
-              关于我 About Me
+              About Me
             </motion.a>
           </div>
         </motion.div>
@@ -93,7 +92,7 @@ export function Hero() {
               <div className="text-center">
                 <div className="mx-auto mb-2 h-16 w-16 rounded-full border border-white/10 bg-white/5" />
                 <p className="text-white/75">
-                  放置个人标志或头像 Place your avatar or logo here
+                  Place your avatar or logo here
                 </p>
               </div>
             </div>

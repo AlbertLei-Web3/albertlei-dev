@@ -1,0 +1,15 @@
+<svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <circle cx="20" cy="20" r="18" fill="#0a0f1f" stroke="#22E1FF" stroke-width="2"/>
+  <circle cx="20" cy="20" r="14" fill="none" stroke="#22E1FF" stroke-width="1" opacity="0.5"/>
+  <text x="20" y="26" text-anchor="middle" font-family="Courier New, monospace" font-size="14" font-weight="bold" fill="#22E1FF" filter="url(#glow)">AL</text>
+  <circle cx="20" cy="20" r="2" fill="#22E1FF" opacity="0.8"/>
+</svg>
