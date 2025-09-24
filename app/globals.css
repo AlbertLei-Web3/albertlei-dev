@@ -1,5 +1,6 @@
 @import './PillNav.css';
 @import './LiquidEther.css';
+@import './ProfileCard.css';
 
 @tailwind base;
 @tailwind components;

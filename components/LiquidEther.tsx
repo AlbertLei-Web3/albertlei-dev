@@ -563,6 +563,21 @@ export default function LiquidEther({
         Common.renderer.render(this.scene, this.camera);
         Common.renderer.setRenderTarget(null);
       }
+      dispose() {
+        try {
+          if (this.scene && this.plane) {
+            if (this.plane.geometry) this.plane.geometry.dispose();
+            // RawShaderMaterial has dispose
+            const mat: any = this.plane.material as any;
+            if (mat && typeof mat.dispose === 'function') mat.dispose();
+            this.scene.remove(this.plane);
+          }
+          if (this.geometry) this.geometry.dispose();
+          if (this.material && (this.material as any).dispose) (this.material as any).dispose();
+        } catch {
+          /* noop */
+        }
+      }
     }
 
     class Advection extends ShaderPass {
@@ -612,6 +627,17 @@ export default function LiquidEther({
         if (typeof BFECC === 'boolean') this.uniforms.isBFECC.value = BFECC;
         super.update();
       }
+      dispose() {
+        try {
+          if (this.line) {
+            if (this.line.geometry) this.line.geometry.dispose();
+            const m: any = this.line.material as any;
+            if (m && typeof m.dispose === 'function') m.dispose();
+            if (this.scene) this.scene.remove(this.line);
+          }
+        } catch { /* noop */ }
+        super.dispose();
+      }
     }
 
     class ExternalForce extends ShaderPass {
@@ -659,6 +685,17 @@ export default function LiquidEther({
         uniforms.center.value.set(centerX, centerY);
         uniforms.scale.value.set(cursorSize, cursorSize);
         super.update();
+      }
+      dispose() {
+        try {
+          if (this.mouse) {
+            if (this.mouse.geometry) this.mouse.geometry.dispose();
+            const m: any = this.mouse.material as any;
+            if (m && typeof m.dispose === 'function') m.dispose();
+            if (this.scene) this.scene.remove(this.mouse);
+          }
+        } catch { /* noop */ }
+        super.dispose();
       }
     }
 
@@ -937,6 +974,21 @@ export default function LiquidEther({
         const pressure = this.poisson.update({ iterations: this.options.iterations_poisson });
         this.pressure.update({ vel, pressure });
       }
+      dispose() {
+        try {
+          this.advection?.dispose?.();
+          this.externalForce?.dispose?.();
+          this.viscous?.dispose?.();
+          this.divergence?.dispose?.();
+          this.poisson?.dispose?.();
+          this.pressure?.dispose?.();
+          for (const key in this.fbos) {
+            const rt = this.fbos[key];
+            if (rt) rt.dispose();
+            this.fbos[key] = null;
+          }
+        } catch { /* noop */ }
+      }
     }
 
     class Output {
@@ -977,6 +1029,17 @@ export default function LiquidEther({
         this.simulation.update();
         this.render();
       }
+      dispose() {
+        try {
+          if (this.output) {
+            if (this.output.geometry) this.output.geometry.dispose();
+            const m: any = this.output.material as any;
+            if (m && typeof m.dispose === 'function') m.dispose();
+            this.scene.remove(this.output);
+          }
+          this.simulation.dispose();
+        } catch { /* noop */ }
+      }
     }
 
     class WebGLManager implements LiquidEtherWebGL {
@@ -985,6 +1048,8 @@ export default function LiquidEther({
       autoDriver?: AutoDriver;
       lastUserInteraction = performance.now();
       running = false;
+      targetFps = 60;
+      lastTick = performance.now();
       private _loop = this.loop.bind(this);
       private _resize = this.resize.bind(this);
       private _onVisibility?: () => void;
@@ -1033,7 +1098,12 @@ export default function LiquidEther({
       }
       loop() {
         if (!this.running) return;
-        this.render();
+        const now = performance.now();
+        const interval = 1000 / this.targetFps;
+        if (now - this.lastTick >= interval) {
+          this.lastTick = now;
+          this.render();
+        }
         rafRef.current = requestAnimationFrame(this._loop);
       }
       start() {
@@ -1053,6 +1123,7 @@ export default function LiquidEther({
           window.removeEventListener('resize', this._resize);
           if (this._onVisibility) document.removeEventListener('visibilitychange', this._onVisibility);
           Mouse.dispose();
+          if (this.output) this.output.dispose();
           if (Common.renderer) {
             const canvas = Common.renderer.domElement;
             if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
