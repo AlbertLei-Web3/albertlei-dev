@@ -84,10 +84,12 @@ export function ProjectCard({ project }: { project: Project }) {
             <div className="h-full w-full bg-gradient-to-br from-white/5 via-white/10 to-white/5" />
           )}
 
-          {/* 悬浮播放/详情提示 Hover affordance */}
+          {/* 悬浮播放图标 Hover play icon */}
           <div className="absolute inset-0 grid place-items-center">
-            <div className="rounded-full border border-white/20 bg-black/40 px-3 py-1 text-xs text-white/90 backdrop-blur">
-              Click to view details
+            <div className="rounded-full border border-white/20 bg-black/40 p-3 backdrop-blur transition-transform group-hover:scale-110">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white/90">
+                <path d="M8 5v14l11-7z" fill="currentColor"/>
+              </svg>
             </div>
           </div>
 
