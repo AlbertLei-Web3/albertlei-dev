@@ -15,6 +15,10 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import ProjectModal from "./ProjectModal";
 
+// 中文：为了解决某些类型推断在项目环境下对 motion.* 的 HTML 属性兼容性问题
+// English: work around occasional typing issues for motion.* accepting HTML props in this project setup
+const MotionDiv = motion.div as any;
+
 export type Project = {
   id: string;
   title: string;
@@ -38,6 +42,9 @@ export function ProjectCard({ project }: { project: Project }) {
   // 中文：控制弹窗的开关
   // English: control modal visibility
   const [open, setOpen] = useState(false);
+  // 中文：小屏(≤800px)下控制标签是否展开
+  // English: controls whether tags are expanded on small screens (≤800px)
+  const [tagsExpanded, setTagsExpanded] = useState(false);
 
   // 中文：若未提供 poster，尝试为常见外链源自动生成缩略图（YouTube / Google Drive）
   // English: auto-generate thumbnail for common providers if poster is missing
@@ -67,13 +74,14 @@ export function ProjectCard({ project }: { project: Project }) {
 
   return (
     <>
-      <motion.article
+      <MotionDiv
         initial={{ opacity: 0, y: 14 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.5 }}
         className="group glass relative overflow-hidden rounded-xl ring-1 ring-white/10 cursor-pointer"
         onClick={() => setOpen(true)}
+        role="article"
       >
         {/* 媒体区域占位（不直接加载视频/iframe，减轻首屏） */}
         {/* Media placeholder (we do NOT load video/iframe here) */}
@@ -111,15 +119,54 @@ export function ProjectCard({ project }: { project: Project }) {
 
           {/* Tags on card */}
           {project.tags && project.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="rounded-full px-3 py-1 text-xs font-semibold text-neon-cyan ring-1 ring-neon-cyan/40 bg-neon-cyan/15 hover:bg-neon-cyan/25 transition-colors"
+            <div className="space-y-2">
+              {/**
+               * 中文：
+               * - 小屏(≤800px)默认仅显示两行标签（通过限高与 overflow-hidden 实现）；
+               * - 提供“View more/less”按钮，点击不会触发卡片弹窗。
+               * 
+               * English:
+               * - On ≤800px screens show only two tag rows (via max-height + overflow-hidden);
+               * - Provide a "View more/less" button; clicking does not open the card modal.
+               */}
+              <div className="relative">
+                <div
+                  className={
+                    tagsExpanded
+                      ? "flex flex-wrap gap-2"
+                      : "flex flex-wrap gap-2 max-[800px]:max-h-12 max-[800px]:overflow-hidden"
+                  }
                 >
-                  {tag}
-                </span>
-              ))}
+                  {project.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="rounded-full px-3 py-1 text-xs font-semibold text-neon-cyan ring-1 ring-neon-cyan/40 bg-neon-cyan/15 hover:bg-neon-cyan/25 transition-colors"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                {/* 中文：未展开时在小屏显示顶部渐隐遮罩；English: fading overlay when collapsed on small screens */}
+                {!tagsExpanded && (
+                  <div className="hidden max-[800px]:block pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-base-900/95 to-transparent" />
+                )}
+              </div>
+
+              {/* 中文：小屏显示展开/收起按钮；English: toggle only on small screens */}
+              {(project.tags?.length || 0) > 6 && (
+                <div className="hidden max-[800px]:flex pt-1">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTagsExpanded((v) => !v);
+                    }}
+                    className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 ring-1 ring-white/15 hover:bg-white/15"
+                  >
+                    {tagsExpanded ? "View less" : "View more"}
+                  </button>
+                </div>
+              )}
             </div>
           )}
 
@@ -162,7 +209,7 @@ export function ProjectCard({ project }: { project: Project }) {
             </div>
           )}
         </div>
-      </motion.article>
+      </MotionDiv>
 
       {/* 详情弹窗 Detail modal */}
       <ProjectModal open={open} onClose={() => setOpen(false)} project={project} />

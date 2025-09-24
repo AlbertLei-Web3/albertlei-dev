@@ -7,7 +7,7 @@
  * - Next.js App Router layout with base SEO (title/description/OG/Twitter)
  * - Provides global neon background and subtle grid overlay
  */
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import LiquidEtherBackground from "@/components/LiquidEtherBackground";
 
@@ -31,6 +31,14 @@ export const metadata: Metadata = {
   },
   metadataBase: new URL("https://your-domain.com"),
   icons: { icon: "/favicon.ico" },
+};
+
+// 中文：声明移动端 viewport，启用全面屏安全区；English: declare mobile viewport with safe-area support
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({

@@ -1,9 +1,11 @@
 .pill-nav-container {
-  position: absolute;
-  top: 1em;
+  position: fixed;
+  top: max(1em, env(safe-area-inset-top));
   left: 50%;
   transform: translateX(-50%);
   z-index: 99;
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
 }
 
 @media (max-width: 768px) {
@@ -41,7 +43,7 @@
   .pill-nav {
     width: 100%;
     justify-content: space-between;
-    padding: 0 1rem;
+    padding: 0 0.75rem;
     background: transparent;
   }
 }
@@ -106,6 +108,12 @@
     inset 0 0 15px rgba(34, 225, 255, 0.1);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+}
+
+@media (max-width: 768px) {
+  .pill-logo {
+    --nav-h: 48px;
+  }
 }
 
 .pill-logo::before {
@@ -183,6 +191,13 @@
   border: 1px solid transparent;
   font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
   text-shadow: 0 0 10px currentColor;
+}
+
+@media (max-width: 768px) {
+  .pill {
+    --pill-pad-x: 20px;
+    font-size: 16px;
+  }
 }
 
 /* 霓虹悬停效果 Neon hover effect */
@@ -334,10 +349,11 @@
 }
 
 .mobile-menu-popover {
-  position: absolute;
-  top: 3em;
-  left: 1rem;
-  right: 1rem;
+  /* 中文：用 fixed 脱离父级定位/裁剪，避免被覆盖；English: use fixed to avoid parent clipping */
+  position: fixed;
+  top: max(64px, calc(3em + env(safe-area-inset-top)));
+  left: calc(1rem + env(safe-area-inset-left));
+  right: calc(1rem + env(safe-area-inset-right));
   background: var(--base, #0a0f1f);
   border-radius: 27px;
   border: 1px solid rgba(34, 225, 255, 0.3);
@@ -345,10 +361,13 @@
     0 8px 32px rgba(34, 225, 255, 0.2),
     0 0 40px rgba(34, 225, 255, 0.1),
     inset 0 0 20px rgba(34, 225, 255, 0.05);
-  z-index: 998;
+  z-index: 1200;
   opacity: 0;
   transform-origin: top center;
   visibility: hidden;
+  max-height: calc(100svh - 6em - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 .mobile-menu-list {
@@ -389,4 +408,12 @@
   text-shadow: 
     0 0 10px #22E1FF,
     0 0 20px #22E1FF;
+}
+
+/* 中文：在超小屏（<=480px）完全隐藏导航，避免遮挡内容
+   English: fully hide navbar on very small screens (<=480px) to prevent overlay issues */
+@media (max-width: 800px) {
+  .pill-nav-container {
+    display: none !important;
+  }
 }

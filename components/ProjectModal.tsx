@@ -32,7 +32,7 @@ export default function ProjectModal({
 
   return (
     <div
-      className="fixed inset-0 z-[1000] grid place-items-center p-4"
+      className="fixed inset-0 z-[1000] grid place-items-center p-4 md:p-6"
       aria-modal="true"
       role="dialog"
     >
@@ -43,7 +43,7 @@ export default function ProjectModal({
       />
 
       {/* 容器 Container */}
-      <div className="relative z-[1001] w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#0b0f1e]/95 shadow-2xl">
+      <div className="relative z-[1001] w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#0b0f1e]/95 shadow-2xl max-h-[90svh] md:max-h-[85svh] flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-white/10 p-4">
           <div className="min-w-0">
@@ -65,7 +65,7 @@ export default function ProjectModal({
         </div>
 
         {/* Body */}
-        <div className="grid gap-4 p-4 md:grid-cols-5">
+        <div className="grid gap-4 p-4 md:grid-cols-5 overflow-y-auto">
           {/* Media placeholder + manual play */}
           <div className="md:col-span-3">
             {project.mediaType === "video" ? (
