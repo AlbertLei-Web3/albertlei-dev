@@ -62,7 +62,9 @@
     0 0 60px rgba(34, 225, 255, 0.1),
     inset 0 0 20px rgba(34, 225, 255, 0.05);
   backdrop-filter: blur(10px);
-  overflow: hidden;
+  /* 中文：允许悬停时按钮溢出胶囊容器上边缘，产生“弹出”效果 */
+  /* English: allow pills to overflow capsule container on hover for pop-out effect */
+  overflow: visible;
 }
 
 /* 添加扫描线效果 */
@@ -174,7 +176,9 @@
   white-space: nowrap;
   cursor: pointer;
   position: relative;
-  overflow: hidden;
+  /* 中文：允许内部悬浮圈与标签在放大时超出按钮自身 */
+  /* English: allow inner hover circle/labels to overflow when scaling */
+  overflow: visible;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
   font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
@@ -189,7 +193,10 @@
     0 0 80px rgba(34, 225, 255, 0.4),
     0 0 120px rgba(34, 225, 255, 0.2),
     inset 0 0 30px rgba(34, 225, 255, 0.15);
-  transform: translateY(-3px) scale(1.08);
+  /* 中文：向上弹出并放大。z-index 提升以覆盖胶囊顶部 */
+  /* English: pop upward and scale; raise z-index to render above capsule */
+  transform: translateY(-6px) scale(1.08);
+  z-index: 20;
   border-color: rgba(34, 225, 255, 0.8);
   background: linear-gradient(135deg, 
     rgba(34, 225, 255, 0.2) 0%,
