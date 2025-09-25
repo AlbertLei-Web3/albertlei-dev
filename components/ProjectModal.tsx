@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import type { Project } from "./ProjectCard";
-import {useTranslations} from 'next-intl';
+import {useTranslations, useMessages} from 'next-intl';
 
 /**
  * 中文：
@@ -25,6 +25,8 @@ export default function ProjectModal({
   // 中文：弹窗操作按钮与占位文案的国际化；
   // English: i18n for modal actions and placeholder texts.
   const t = useTranslations('projects.modal');
+  const messages = useMessages() as any;
+  const localized = messages?.projectItems?.[project.id];
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -51,12 +53,12 @@ export default function ProjectModal({
         {/* Header */}
         <div className="flex items-start justify-between gap-4 border-b border-white/10 p-4">
           <div className="min-w-0">
-            <h3 className="text-lg font-semibold">{project.title}</h3>
+            <h3 className="text-lg font-semibold">{localized?.title ?? project.title}</h3>
             <p
               className="mt-1 text-sm text-white/70 line-clamp-2 md:line-clamp-3"
-              title={project.description}
+              title={localized?.description ?? project.description}
             >
-              {project.description}
+              {localized?.description ?? project.description}
             </p>
           </div>
           <button
@@ -97,8 +99,8 @@ export default function ProjectModal({
           {/* Details */}
           <div className="md:col-span-2">
             <div className="space-y-3 text-sm text-white/80">
-              {project.longDescription ? (
-                <p className="leading-relaxed">{project.longDescription}</p>
+              {localized?.longDescription || project.longDescription ? (
+                <p className="leading-relaxed">{localized?.longDescription ?? project.longDescription}</p>
               ) : (
                 <p className="leading-relaxed">{t('more')}</p>
               )}

@@ -12,6 +12,7 @@
  * - Hover animation and accessibility (aria-label).
  */
 import React, { useState, useCallback, useEffect } from "react";
+import {useTranslations} from 'next-intl';
 import { Mail, Github, Linkedin, X as CloseIcon, Send } from "lucide-react";
 
 // 中文：简单的微信图标（内联 SVG），避免额外依赖；
@@ -59,6 +60,9 @@ function XLogoIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function Footer() {
+  // 中文：本组件需要多语言标题（“联系/Contact”），因此接入 next-intl
+  // English: Use next-intl to localize the section title ("联系/Contact").
+  const tNav = useTranslations('nav');
   // 中文：控制微信弹窗的可见性
   // English: Control visibility of the WeChat modal
   const [isWeChatOpen, setIsWeChatOpen] = useState(false);
@@ -77,6 +81,20 @@ export function Footer() {
       // 高亮 2.2 秒后自动关闭
       setTimeout(() => setHighlightContacts(false), 2200);
     };
+  }, []);
+
+  // 中文：当地址栏的 hash 变为 #contact（例如点击顶部导航锚点）时，自动触发高亮效果。
+  // English: When URL hash changes to #contact (e.g., clicking the top nav anchor), auto trigger highlight.
+  useEffect(() => {
+    const tryHighlight = () => {
+      if (typeof window === 'undefined') return;
+      if (window.location.hash === '#contact') {
+        (window as any).__highlightContactCard?.();
+      }
+    };
+    tryHighlight();
+    window.addEventListener('hashchange', tryHighlight);
+    return () => window.removeEventListener('hashchange', tryHighlight);
   }, []);
 
   // 中文：键盘可访问性——按下 ESC 关闭弹窗
@@ -147,7 +165,9 @@ export function Footer() {
        * English: Switch to items-start / text-left so the "Contact" title sits at top-left of the card.
        */}
       <div className={`glass flex flex-col items-start gap-3 px-6 py-6 text-left ${highlightContacts ? 'ring-2 ring-neon-cyan/70 shadow-[0_0_24px_rgba(34,225,255,0.6)]' : ''}`}>
-        <h4 className="neon-text text-lg font-semibold">Contact</h4>
+        {/* 中文：标题跟随语言环境显示（zh=联系，en=Contact） */}
+        {/* English: Title follows locale (zh=联系, en=Contact). */}
+        <h4 className="neon-text text-lg font-semibold">{tNav('contact')}</h4>
 
         {/**
          * 中文：展示真实邮箱地址

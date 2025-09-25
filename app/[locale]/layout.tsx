@@ -9,15 +9,15 @@ export const metadata: Metadata = {
   title: '雷雨奇 — Web3 & AI Projects | 赛博霓虹作品集',
   description: '雷雨奇的 Web3 与 AI 项目展示。',
   openGraph: {
-    title: 'Lei Yuqi — Web3 & AI Projects',
+    title: 'Albert Lei — Web3 & AI Projects',
     description: 'Cyberpunk neon portfolio showcasing Web3 and AI projects with video demos.',
     url: 'https://your-domain.com',
-    siteName: 'Lei Yuqi Dev',
+    siteName: 'Albert Lei Dev',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Lei Yuqi — Web3 & AI Projects',
+    title: 'Albert Lei — Web3 & AI Projects',
     description: 'Cyberpunk neon portfolio showcasing Web3 and AI projects with video demos.'
   },
   metadataBase: new URL('https://your-domain.com'),

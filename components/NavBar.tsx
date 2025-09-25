@@ -24,14 +24,16 @@ export function NavBar() {
   const base = `/${locale}`; // 语言前缀 locale prefix
 
   return (
-    <div className="sticky top-0 z-40">
+    // 中文：使用 sticky + top-7 固定导航相对视口顶部 1.75rem，滚动时位置稳定
+    // English: Use sticky + top-7 to keep the navbar offset 1.75rem from viewport top, stable on scroll
+    <div className="sticky top-7 z-40">
       <motion.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6 }}
       >
-        {/* Desktop / Tablet: 原有胶囊导航 */}
-        <div className="hidden sm:flex mx-auto max-w-7xl px-4 py-4 justify-center">
+        {/* Desktop / Tablet: 原有胶囊导航（去掉 mt-7，offset 改由 sticky top-7 提供） */}
+        <div className="hidden sm:flex relative items-center mx-auto max-w-7xl px-4 py-4 justify-center">
           <PillNav
             logo="/logo.svg" // SVG logo with neon styling
             logoAlt={tHero('name')}
@@ -46,6 +48,11 @@ export function NavBar() {
             hoveredPillTextColor="#22E1FF" // 悬停时霓虹青色文字
             pillTextColor="#22E1FF" // 正常时霓虹青色文字
           />
+          {/* 中文：让语言切换按钮与导航条平行对齐（同一水平线，靠右） */}
+          {/* English: Align locale toggle on the same baseline as nav, anchored to the right. */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
+            <LocaleToggle />
+          </div>
         </div>
 
         {/* Mobile: 简洁底部导航条（固定底部） */}
@@ -68,7 +75,11 @@ export function NavBar() {
                         const id = i.href.split('#')[1];
                         const el = document.getElementById(id);
                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        else location.assign(i.href);
+                else location.assign(i.href);
+                // 中文：滚动后主动触发“联系卡片”高亮；English: trigger highlight after scroll
+                if (id === 'contact' && (window as any).__highlightContactCard) {
+                  setTimeout(() => (window as any).__highlightContactCard(), 350);
+                }
                       }
                     }}
                   >
@@ -80,10 +91,7 @@ export function NavBar() {
           </nav>
         </div>
 
-        {/* 语言切换器：保留路径/查询/锚点 */}
-        <div className="absolute right-4 top-2 hidden sm:flex gap-2">
-          <LocaleToggle />
-        </div>
+        {/* 移除了顶部独立定位的语言切换器，改为与导航平行布局 */}
       </motion.div>
     </div>
   );

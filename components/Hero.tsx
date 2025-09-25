@@ -14,11 +14,13 @@
 import { motion } from "framer-motion";
 import ProfileCard from "./ProfileCard";
 import React from "react";
-import {useTranslations} from 'next-intl';
+import {useTranslations, useLocale} from 'next-intl';
 
 export function Hero() {
   // 中文：Hero 文案国际化；English: i18n for Hero texts
   const t = useTranslations('hero');
+  // 中文：根据语言决定标题是否单行；English: make zh single-line, keep en two lines
+  const locale = useLocale();
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-10 md:pt-16">
       
@@ -44,12 +46,23 @@ export function Hero() {
            * - Add larger bottom margin between lines for comfortable spacing.
            */}
           <h1 className="neon-text text-3xl font-extrabold tracking-tight leading-[1.32] md:text-5xl md:leading-[1.22] overflow-visible">
-            <span className="block bg-gradient-to-r from-white via-white to-neon-cyan/80 bg-clip-text text-transparent mb-2 md:mb-3">
-              {t('h1a')}
-            </span>
-            <span className="block bg-gradient-to-r from-neon-cyan/90 via-white to-white bg-clip-text text-transparent">
-              {t('h1b')}
-            </span>
+            {locale === 'zh' ? (
+              // 中文：在中文环境，将两段标题合并为单行，避免换行；
+              // English: For zh, merge both parts into a single line.
+              <span className="block bg-gradient-to-r from-white via-white to-neon-cyan/80 bg-clip-text text-transparent">
+                {t('h1a')}{t('h1b')}
+              </span>
+            ) : (
+              // 英文保持两行；English: keep two lines for English
+              <>
+                <span className="block bg-gradient-to-r from-white via-white to-neon-cyan/80 bg-clip-text text-transparent mb-2 md:mb-3">
+                  {t('h1a')}
+                </span>
+                <span className="block bg-gradient-to-r from-neon-cyan/90 via-white to-white bg-clip-text text-transparent">
+                  {t('h1b')}
+                </span>
+              </>
+            )}
           </h1>
 
           {/**

@@ -25,7 +25,7 @@
     "tagline": "打造下一代去中心化与智能应用",
     "intro": "专注链上应用、Web3 协议与 AI 驱动的产品原型，兼顾高品质体验与未来视觉；持续探索前沿技术如何服务真实的人类体验。",
     "viewProjects": "查看项目",
-    "contact": "联系我",
+    "contact": "联系",
     "name": "雷雨奇",
     "title": "Web3 × AI 开发者",
     "handle": "Lei_Yuqi",
@@ -37,7 +37,7 @@
     "view_more": "展开更多",
     "view_less": "收起",
     "card": {
-      "website": "官网",
+      "website": "Website",
       "github": "GitHub",
       "tags_more": "展开更多",
       "tags_less": "收起"
@@ -45,7 +45,7 @@
     "modal": {
       "close": "关闭",
       "more": "这里将展示更详细的项目信息。可在 Project 对象中补充 longDescription、tags、repoUrl 与 demoUrl。",
-      "website": "官网",
+      "website": "Website",
       "source": "源码"
     }
   },

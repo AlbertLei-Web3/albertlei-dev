@@ -236,6 +236,27 @@ const PillNav: React.FC<PillNavProps> = ({
 
   const isRouterLink = (href?: string) => href && !isExternalLink(href);
 
+  // 中文：处理锚点点击，平滑滚动并在联系锚点触发高亮
+  // English: Handle hash anchors; smooth scroll and trigger contact highlight
+  const handleItemClick = (e: React.MouseEvent<HTMLElement>, href?: string) => {
+    if (!href) return;
+    if (!href.includes('#')) return;
+    e.preventDefault();
+    const id = href.split('#')[1];
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // 触发联系卡片高亮 Trigger highlight for contact card
+      if (id === 'contact' && (window as any).__highlightContactCard) {
+        setTimeout(() => (window as any).__highlightContactCard(), 350);
+      }
+      // 更新 hash（不刷新）Update hash without reload
+      history.replaceState(null, '', `#${id}`);
+    } else {
+      location.assign(href);
+    }
+  };
+
   const cssVars = {
     ['--base']: baseColor,
     ['--pill-bg']: pillColor,
@@ -285,6 +306,7 @@ const PillNav: React.FC<PillNavProps> = ({
                     aria-label={item.ariaLabel || item.label}
                     onMouseEnter={() => handleEnter(i)}
                     onMouseLeave={() => handleLeave(i)}
+                    onClick={(e) => handleItemClick(e as any, item.href)}
                   >
                     <span
                       className="hover-circle"
@@ -308,6 +330,7 @@ const PillNav: React.FC<PillNavProps> = ({
                     aria-label={item.ariaLabel || item.label}
                     onMouseEnter={() => handleEnter(i)}
                     onMouseLeave={() => handleLeave(i)}
+                    onClick={(e) => handleItemClick(e as any, item.href)}
                   >
                     <span
                       className="hover-circle"
