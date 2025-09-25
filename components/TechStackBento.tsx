@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import type { Project } from "./ProjectCard";
 
 /**
@@ -112,13 +113,14 @@ export default function TechStackBento({
 
   // 技能归属的角色
   const resolveRole = (skill: string): string | undefined => {
-    if (!roleSkills) return undefined;
+    if (!roleSkills) return "Full-Stack Developer"; // 默认归入 Full-Stack Developer
     const key = skill.toLowerCase();
     for (const role of Object.keys(roleSkills)) {
       const list = roleSkills[role] || [];
       if (list.some((s) => String(s).toLowerCase() === key)) return role;
     }
-    return undefined;
+    // 未命中映射时，默认归入 Full-Stack Developer
+    return "Full-Stack Developer";
   };
 
   if (items.length === 0) {
@@ -156,62 +158,93 @@ export default function TechStackBento({
     "xl:col-start-11 xl:row-start-5",
   ];
 
+  // 交互：中心芯片与环绕标签
+  const [activeRole, setActiveRole] = useState<string | null>(null);
+
+  // 计算角色→技能的字典（优先使用传入的 roleSkills，否则根据 tags 推断）
+  const roleToSkills: Record<string, string[]> = useMemo(() => {
+    if (roleSkills) return roleSkills;
+    const dict: Record<string, string[]> = {};
+    for (const [name] of items) {
+      const r = resolveRole(name) || "Full-Stack Developer";
+      (dict[r] ||= []).push(name);
+    }
+    return dict;
+  }, [roleSkills, items]);
+
+  const rolesOrder = ["Web3 × AI", "Founder", "Full-Stack Developer", "Project Manager"]; 
+  const roleCounts: Record<string, number> = useMemo(() => {
+    const res: Record<string, number> = {};
+    for (const r of rolesOrder) res[r] = (roleToSkills[r] || []).length;
+    return res;
+  }, [roleToSkills]);
+
+  // 颜色工具
+  const chipStyle = (role: string) => {
+    const hue = palette[role] || "amber";
+    const bg = hexToRgba(hueColorMap[hue] || "#22E1FF", 0.15);
+    const ring = hexToRgba(hueColorMap[hue] || "#22E1FF", 0.35);
+    const text = hexToRgba(hueColorMap[hue] || "#22E1FF", 0.95);
+    return { backgroundColor: bg, boxShadow: `0 0 16px ${ring}`, color: text, borderColor: ring } as React.CSSProperties;
+  };
+
+  // Tabs × Bento：上方角色 Tabs，下方技能 Chip 网格
+  const [tabRole, setTabRole] = useState<string>(rolesOrder[0]);
+
+  const displaySkills = useMemo(() => {
+    return (roleToSkills[tabRole] || []).slice();
+  }, [roleToSkills, tabRole]);
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 auto-rows-fr gap-4 md:grid-cols-6 xl:grid-cols-12">
-        {/* 中央品牌卡 */}
-        <div className="glass relative flex items-center justify-between rounded-2xl bg-white/5 p-6 text-center ring-1 ring-white/10 md:col-span-4 md:col-start-2 md:row-start-2 md:row-span-2 xl:col-span-6 xl:col-start-4 xl:row-start-2 xl:row-span-2">
-          <div className="select-none mx-auto">
-            <div className="mx-auto mb-2 h-10 w-10 rounded-lg bg-neon-cyan/20 ring-1 ring-neon-cyan/40 shadow-neonCyan" />
-            <div className="text-2xl font-extrabold tracking-wide text-white/90">{title}</div>
-            <div className="mt-1 text-xs text-white/60">Auto-aggregated from projects</div>
-          </div>
-          {/* 角色色块图例（右上角横向排列） */}
-          <div className="absolute right-3 top-3 flex items-center gap-2">
-            {Object.entries(palette).map(([role, hue]) => (
-              <div key={role} className="flex items-center gap-1">
-                <span className={`inline-block h-2.5 w-3 rounded-sm`} style={{ backgroundColor: hueColorMap[hue] || "#22E1FF" }} aria-hidden />
-                <span className="text-[10px] text-white/70 whitespace-nowrap">{role}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* 环绕卡片（缩小尺寸：p-3、text-xs、进度条 h-1.5；xl 变为 col-span-2） */}
-        {items.map(([name, count], idx) => {
-          const pct = Math.round((count / maxCount) * 100);
-          const mdClass = mdSlots[idx] || "";
-          const xlClass = xlSlots[idx] || "";
-          return (
-            <div
-              key={name}
-              className={`glass rounded-2xl bg-white/5 p-3 ring-1 ring-white/10 md:col-span-2 xl:col-span-2 ${mdClass} ${xlClass}`}
-            >
-              <div className="mb-1.5 text-xs font-medium text-white/85">{name}</div>
-              <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10 ring-1 ring-white/10">
-                <div
-                  className="h-full"
-                  style={{
-                    width: `${Math.max(8, pct)}%`,
-                    background: (() => {
-                      const role = resolveRole(name);
-                      const hue = role ? palette[role] : undefined;
-                      if (!hue) return "linear-gradient(90deg, #22E1FFB3, #22E1FF, #ffffff)";
-                      const base = hueColorMap[hue] || "#22E1FF";
-                      return `linear-gradient(90deg, ${hexToRgba(base, 0.7)}, ${base}, #ffffff)`;
-                    })(),
-                  }}
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-valuenow={pct}
-                  aria-label={`${name} ${pct}%`}
-                />
-              </div>
-            </div>
-          );
-        })}
+      {/* Tabs - 横向可滚动，显示计数 */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {rolesOrder.map((r) => (
+          <button
+            key={r}
+            onClick={() => setTabRole(r)}
+            className={`whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${tabRole === r ? 'ring-1 ring-white/30 scale-[1.02]' : 'opacity-90 hover:opacity-100'}`}
+            style={chipStyle(r)}
+            aria-pressed={tabRole === r}
+          >
+            {r}
+            <span className="ml-1 inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] align-middle">
+              {roleCounts[r] ?? 0}
+            </span>
+          </button>
+        ))}
       </div>
+
+      {/* Bento Chips with animation */}
+      <AnimatePresence mode="popLayout">
+        <motion.div
+          key={tabRole}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.18 }}
+          className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4"
+          aria-live="polite"
+        >
+          {displaySkills.map((skill) => (
+            <motion.span
+              key={skill}
+              layout
+              className="truncate rounded-xl border px-3 py-2 text-[12px] font-medium"
+              style={chipStyle(tabRole)}
+              title={skill}
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.15 }}
+            >
+              {skill}
+            </motion.span>
+          ))}
+          {displaySkills.length === 0 && (
+            <div className="col-span-full text-sm text-white/60">No skills found for this role.</div>
+          )}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
