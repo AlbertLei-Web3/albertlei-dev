@@ -111,17 +111,10 @@ export default function HomePage() {
          */}
         <section
           id="about"
-          className="mt-14 rounded-2xl bg-white/5 p-6 ring-1 ring-white/10"
+          className="mt-14 relative z-[20] rounded-2xl bg-white/5 p-6 ring-1 ring-white/10"
         >
-          {/* 标题 + 右侧角色标签（固定配色） */}
-          <div className="mb-4 flex items-center justify-between gap-3">
+          <div className="mb-4">
             <h2 className="neon-text text-xl font-bold">About</h2>
-            <div className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="rounded-full px-2.5 py-1 font-medium text-emerald-300 bg-emerald-500/15 ring-1 ring-emerald-400/30 whitespace-nowrap">Web3 × AI</span>
-              <span className="rounded-full px-2.5 py-1 font-medium text-rose-300 bg-rose-500/15 ring-1 ring-rose-400/30 whitespace-nowrap">Founder</span>
-              <span className="rounded-full px-2.5 py-1 font-medium text-amber-300 bg-amber-500/15 ring-1 ring-amber-400/30 whitespace-nowrap">Full-Stack Developer</span>
-              <span className="rounded-full px-2.5 py-1 font-medium text-indigo-300 bg-indigo-500/15 ring-1 ring-indigo-400/30 whitespace-nowrap">Project Manager</span>
-            </div>
           </div>
           <TechStackBento
             projects={projects}
@@ -145,7 +138,7 @@ export default function HomePage() {
                 "Tokenomics",
                 "OpenAI API",
                 "Whisper API",
-                "Python自动化",
+                "Python Automation",
                 "Testnets",
                 "GitHub Actions",
                 "Docker",

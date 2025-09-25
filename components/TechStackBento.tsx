@@ -2,6 +2,7 @@
 
 import React, { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import TechRadar from "./TechRadar";
 import type { Project } from "./ProjectCard";
 
 /**
@@ -111,6 +112,16 @@ export default function TechStackBento({
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
 
+  /**
+   * 中文：根据技能名生成稳定的熟练度百分比（30%~80%），保证每次渲染一致。
+   * English: Stable pseudo-random percentage (30%~80%) derived from skill name.
+   */
+  const getSkillPercent = (name: string): number => {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    return 30 + (hash % 51); // 30..80
+  };
+
   // 技能归属的角色
   const resolveRole = (skill: string): string | undefined => {
     if (!roleSkills) return "Full-Stack Developer"; // 默认归入 Full-Stack Developer
@@ -182,10 +193,11 @@ export default function TechStackBento({
   // 颜色工具
   const chipStyle = (role: string) => {
     const hue = palette[role] || "amber";
-    const bg = hexToRgba(hueColorMap[hue] || "#22E1FF", 0.15);
-    const ring = hexToRgba(hueColorMap[hue] || "#22E1FF", 0.35);
-    const text = hexToRgba(hueColorMap[hue] || "#22E1FF", 0.95);
-    return { backgroundColor: bg, boxShadow: `0 0 16px ${ring}`, color: text, borderColor: ring } as React.CSSProperties;
+    const base = hueColorMap[hue] || "#22E1FF";
+    const bg = hexToRgba(base, 0.24);     // 提升背景不透明度，增强对比度
+    const ring = hexToRgba(base, 0.55);    // 更亮的外环/阴影
+    const text = "rgba(255,255,255,0.92)"; // 统一白色文本，提升可读性
+    return { backgroundColor: bg, boxShadow: `0 0 18px ${ring}`, color: text, borderColor: ring } as React.CSSProperties;
   };
 
   // Tabs × Bento：上方角色 Tabs，下方技能 Chip 网格
@@ -195,27 +207,40 @@ export default function TechStackBento({
     return (roleToSkills[tabRole] || []).slice();
   }, [roleToSkills, tabRole]);
 
+  const [view, setView] = useState<"chips" | "radar">("chips");
+  const [compareAll, setCompareAll] = useState<boolean>(false);
+
   return (
     <div className="space-y-4">
-      {/* Tabs - 横向可滚动，显示计数 */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        {rolesOrder.map((r) => (
-          <button
-            key={r}
-            onClick={() => setTabRole(r)}
-            className={`whitespace-nowrap rounded-full border px-3 py-1 text-xs font-semibold transition-colors ${tabRole === r ? 'ring-1 ring-white/30 scale-[1.02]' : 'opacity-90 hover:opacity-100'}`}
-            style={chipStyle(r)}
-            aria-pressed={tabRole === r}
-          >
-            {r}
-            <span className="ml-1 inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] align-middle">
-              {roleCounts[r] ?? 0}
-            </span>
-          </button>
-        ))}
+      {/* Tabs + 视图切换按钮 */}
+      <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {rolesOrder.map((r) => (
+            <button
+              key={r}
+              onClick={() => setTabRole(r)}
+              className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${tabRole === r ? 'ring-1 ring-white/30 scale-[1.02]' : 'opacity-90 hover:opacity-100'}`}
+              style={chipStyle(r)}
+              aria-pressed={tabRole === r}
+            >
+              {r}
+              <span className="ml-1 inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] align-middle">
+                {roleCounts[r] ?? 0}
+              </span>
+            </button>
+          ))}
+        </div>
+        {/* 删除右上重复的角色标签，仅保留切换按钮 */}
+        <button
+          onClick={() => setView((v) => (v === "chips" ? "radar" : "chips"))}
+          className="ml-auto rounded-full border px-3 py-1 text-xs font-semibold text-white/90 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
+        >
+          {view === "chips" ? "Radar" : "Chips"}
+        </button>
       </div>
 
       {/* Bento Chips with animation */}
+      {view === "chips" && (
       <AnimatePresence mode="popLayout">
         <motion.div
           key={tabRole}
@@ -223,28 +248,94 @@ export default function TechStackBento({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.18 }}
-          className="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-4"
+          className="grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-4"
           aria-live="polite"
         >
           {displaySkills.map((skill) => (
-            <motion.span
+            <motion.div
               key={skill}
               layout
-              className="truncate rounded-xl border px-3 py-2 text-[12px] font-medium"
+              className="rounded-xl border px-3.5 py-2.5 text-[13px] font-medium"
               style={chipStyle(tabRole)}
               title={skill}
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.15 }}
             >
-              {skill}
-            </motion.span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="truncate">{skill}</span>
+                {(() => {
+                  const pct = getSkillPercent(skill);
+                  return <span className="text-[10px] text-white/75 tabular-nums">{pct}%</span>;
+                })()}
+              </div>
+              {(() => {
+                const pct = getSkillPercent(skill);
+                const hue = palette[tabRole] || "amber";
+                const base = hueColorMap[hue] || "#22E1FF";
+                return (
+                  <div className="mt-1 h-1.5 w-full rounded-full bg-white/18">
+                    <div
+                      className="h-full rounded-full"
+                      style={{
+                        width: `${pct}%`,
+                        background: `linear-gradient(90deg, ${hexToRgba(base,0.7)}, ${base})`,
+                      }}
+                    />
+                  </div>
+                );
+              })()}
+            </motion.div>
           ))}
           {displaySkills.length === 0 && (
             <div className="col-span-full text-sm text-white/60">No skills found for this role.</div>
           )}
         </motion.div>
       </AnimatePresence>
+      )}
+
+      {view === "radar" && (
+        <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
+          {/* 图例（Compare All 模式） */}
+          {/* Compare 图例移除，避免右上重复展示 */}
+          <TechRadar
+            axes={[
+              "Frontend",
+              "Blockchain",
+              "Data & AI Services",
+              "Infra & DevOps",
+              "PM & Collaboration",
+              "Business",
+            ]}
+            series={compareAll ? [
+              { label:'Web3 × AI', colorHex:'#10B981', values:{ Frontend:85, Blockchain:75, 'Data & AI Services':70, 'Infra & DevOps':60, 'PM & Collaboration':80, Business:65 } },
+              { label:'Founder', colorHex:'#F43F5E', values:{ Frontend:70, Blockchain:55, 'Data & AI Services':58, 'Infra & DevOps':52, 'PM & Collaboration':85, Business:82 } },
+              { label:'Full-Stack Developer', colorHex:'#F59E0B', values:{ Frontend:88, Blockchain:60, 'Data & AI Services':55, 'Infra & DevOps':65, 'PM & Collaboration':72, Business:60 } },
+              { label:'Project Manager', colorHex:'#6366F1', values:{ Frontend:68, Blockchain:52, 'Data & AI Services':56, 'Infra & DevOps':58, 'PM & Collaboration':92, Business:75 } },
+            ] : [
+              {
+                label: tabRole,
+                values: {
+                  Frontend: tabRole === "Full-Stack Developer" ? 88 : 85,
+                  Blockchain: tabRole === "Web3 × AI" ? 75 : 60,
+                  "Data & AI Services": tabRole === "Web3 × AI" ? 70 : 58,
+                  "Infra & DevOps": tabRole === "Full-Stack Developer" ? 65 : 55,
+                  "PM & Collaboration": tabRole === "Project Manager" ? 92 : 80,
+                  Business: tabRole === "Founder" ? 82 : 65,
+                },
+                colorHex:
+                  ({
+                    "Web3 × AI": "#10B981",
+                    Founder: "#F43F5E",
+                    "Full-Stack Developer": "#F59E0B",
+                    "Project Manager": "#6366F1",
+                  } as Record<string, string>)[tabRole] || "#22E1FF",
+              },
+            ]}
+            size={380}
+          />
+        </div>
+      )}
     </div>
   );
 }
