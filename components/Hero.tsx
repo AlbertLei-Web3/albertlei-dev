@@ -64,7 +64,7 @@ export function Hero() {
               Founder
             </span>
             <span className="glass px-3 py-1 text-sm font-medium text-amber-300 bg-amber-500/10 ring-1 ring-amber-400/25">
-              Fullstack Developer
+              Full-Stack Developer
             </span>
             <span className="glass px-3 py-1 text-sm font-medium text-indigo-300 bg-indigo-500/10 ring-1 ring-indigo-400/25">
               Project Manager

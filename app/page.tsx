@@ -116,7 +116,79 @@ export default function HomePage() {
           <div className="mb-4">
             <h2 className="neon-text text-xl font-bold">About</h2>
           </div>
-          <TechStackBento projects={projects} maxItems={12} title="Skills" />
+          <TechStackBento
+            projects={projects}
+            maxItems={0}
+            title="Skills"
+            rolePalette={{
+              "Web3 × AI": "emerald",
+              "Founder": "rose",
+              "Full-Stack Developer": "amber",
+              "Project Manager": "indigo",
+            }}
+            roleSkills={{
+              "Web3 × AI": [
+                "Solidity",
+                "ERC4337",
+                "Hardhat",
+                "Ethers.js",
+                "Web3.js",
+                "DeFi (Swap, Staking, Yield Farming)",
+                "NFT Minting",
+                "Tokenomics",
+                "OpenAI API",
+                "Whisper API",
+                "Python自动化",
+                "Testnets",
+                "GitHub Actions",
+                "Docker",
+                "Vercel",
+              ],
+              "Founder": [
+                "产品设计 (Figma, Notion, Flowchart)",
+                "商业模型设计",
+                "生态合作",
+                "Hackathon原型孵化",
+                "团队管理",
+                "远程协作",
+                "快速迭代",
+                "Demo视频制作",
+                "Pitch Deck",
+              ],
+              "Full-Stack Developer": [
+                "React.js",
+                "Next.js",
+                "TypeScript",
+                "Tailwind CSS",
+                "Wagmi",
+                "Node.js",
+                "Python",
+                "Java",
+                "MongoDB",
+                "Redis",
+                "Zustand",
+                "React Query",
+                "Docker",
+                "GitHub Actions",
+                "Vercel",
+                "Ethers.js",
+                "Web3.js",
+                "Telegram API",
+              ],
+              "Project Manager": [
+                "Jira",
+                "Notion",
+                "Linear",
+                "跨区域远程协作",
+                "Slack",
+                "Discord",
+                "Stakeholder管理",
+                "Delivery governance",
+                "Analytics dashboards",
+                "用户反馈循环",
+              ],
+            }}
+          />
         </section>
       </main>
 
