@@ -72,6 +72,12 @@ export default function LiquidEtherBackground() {
           // 额外的性能优化
           imageRendering: 'crisp-edges', // 优化图像渲染，避免模糊
         }}
+        // 中文：根据路由是否在首页决定是否活跃；下滑至其他页面时暂停渲染
+        // English: Pause rendering when not on the home route to save resources
+        active={typeof window !== 'undefined' ? location.pathname === '/' : true}
+        // 中文：在非首页时适当降低帧率（不影响强度，仅节流 rAF）
+        // English: Slightly lower FPS off-home to throttle rAF without changing visuals
+        targetFps={typeof window !== 'undefined' && location.pathname !== '/' ? 30 : 60}
       />
     </div>
   );

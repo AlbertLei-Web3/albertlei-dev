@@ -22,6 +22,16 @@ export interface LiquidEtherProps {
   takeoverDuration?: number;
   autoResumeDelay?: number;
   autoRampDuration?: number;
+  /**
+   * 中文：是否激活渲染（用于路由切换时暂停以节能）。
+   * English: Whether the effect is active; can pause on non-home routes to save resources.
+   */
+  active?: boolean;
+  /**
+   * 中文：目标帧率（默认 60）。仅影响更新频率，不改变特效强度。
+   * English: Target FPS (default 60). Only throttles update cadence; does not change visuals.
+   */
+  targetFps?: number;
 }
 
 interface SimOptions {
@@ -74,7 +84,9 @@ export default function LiquidEther({
   autoIntensity = 2.2,
   takeoverDuration = 0.25,
   autoResumeDelay = 1000,
-  autoRampDuration = 0.6
+  autoRampDuration = 0.6,
+  active = true,
+  targetFps = 60
 }: LiquidEtherProps): React.ReactElement {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const webglRef = useRef<LiquidEtherWebGL | null>(null);
@@ -83,6 +95,7 @@ export default function LiquidEther({
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const isVisibleRef = useRef<boolean>(true);
   const resizeRafRef = useRef<number | null>(null);
+  const targetFpsRef = useRef<number>(targetFps);
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -1146,7 +1159,8 @@ export default function LiquidEther({
       autoIntensity,
       takeoverDuration,
       autoResumeDelay,
-      autoRampDuration
+      autoRampDuration,
+      targetFps: targetFpsRef.current
     });
     webglRef.current = webgl;
 
@@ -1170,7 +1184,7 @@ export default function LiquidEther({
       if (resolution !== prevRes) sim.resize();
     };
     applyOptionsFromProps();
-    webgl.start();
+    if (active) webgl.start();
 
     const io = new IntersectionObserver(
       entries => {
@@ -1238,7 +1252,8 @@ export default function LiquidEther({
     autoIntensity,
     takeoverDuration,
     autoResumeDelay,
-    autoRampDuration
+    autoRampDuration,
+    active
   ]);
 
   useEffect(() => {
@@ -1270,6 +1285,11 @@ export default function LiquidEther({
       }
     }
     if (resolution !== prevRes) sim.resize();
+    // 更新目标帧率与运行状态
+    targetFpsRef.current = targetFps;
+    (webgl as any).targetFps = targetFpsRef.current;
+    if (active && !(webgl as any).running) webgl.start();
+    if (!active && (webgl as any).running) webgl.pause();
   }, [
     mouseForce,
     cursorSize,
@@ -1286,7 +1306,9 @@ export default function LiquidEther({
     autoIntensity,
     takeoverDuration,
     autoResumeDelay,
-    autoRampDuration
+    autoRampDuration,
+    active,
+    targetFps
   ]);
 
   return <div ref={mountRef} className={`liquid-ether-container ${className || ''}`} style={style} />;

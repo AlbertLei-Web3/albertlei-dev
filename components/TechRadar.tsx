@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 type RadarSeries = {
   label: string;
@@ -17,10 +17,35 @@ export default function TechRadar({
   series: RadarSeries[];
   size?: number;
 }) {
+  // 中文：响应式尺寸：根据外层容器宽度动态取最小值，避免在 400x800 下溢出
+  // English: Responsive chart size based on container width to avoid overflow on 400x800
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [containerW, setContainerW] = useState<number>(size);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const w = el.getBoundingClientRect().width;
+      setContainerW(Math.max(1, Math.floor(w)));
+    });
+    ro.observe(el);
+    // 初始计算
+    const w0 = el.getBoundingClientRect().width;
+    setContainerW(Math.max(1, Math.floor(w0)));
+    return () => ro.disconnect();
+  }, []);
+
+  const usedSize = useMemo(() => {
+    // 预留内边距 8px，设置最小尺寸 180，最大不超过 props.size
+    const s = Math.max(180, Math.min(size, containerW - 8));
+    return isFinite(s) && s > 0 ? s : size;
+  }, [containerW, size]);
+
   const levels = 5; // 网格圈数 grid levels
   const padding = 32;
-  const radius = Math.max(50, (size - padding * 2) / 2);
-  const center = { x: size / 2, y: size / 2 };
+  const radius = Math.max(50, (usedSize - padding * 2) / 2);
+  const center = { x: usedSize / 2, y: usedSize / 2 };
 
   const angleFor = (i: number) => (Math.PI * 2 * i) / axes.length - Math.PI / 2; // 起点朝上 start at top
 
@@ -43,8 +68,8 @@ export default function TechRadar({
   }, [series, axes]);
 
   return (
-    <div className="relative w-full overflow-hidden">
-      <svg width="100%" height={size} viewBox={`0 0 ${size} ${size}`} role="img" aria-label="Skills radar chart">
+    <div ref={wrapRef} className="relative w-full overflow-hidden">
+      <svg width="100%" height={usedSize} viewBox={`0 0 ${usedSize} ${usedSize}`} role="img" aria-label="Skills radar chart">
         {/* 网格圆环 grid rings */}
         {[...Array(levels)].map((_, li) => {
           const r = radius * ((li + 1) / levels);

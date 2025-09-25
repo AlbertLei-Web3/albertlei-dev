@@ -111,7 +111,7 @@ export default function HomePage() {
          */}
         <section
           id="about"
-          className="mt-14 relative z-[20] rounded-2xl bg-white/5 p-6 ring-1 ring-white/10"
+          className="mt-14 relative z-[20] rounded-2xl bg-white/5 p-6 ring-1 ring-white/10 about-safe"
         >
           <div className="mb-4">
             <h2 className="neon-text text-xl font-bold">About</h2>

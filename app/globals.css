@@ -131,6 +131,39 @@ html, body {
   100% { box-shadow: 0 0 0 rgba(34,225,255,0.0); }
 }
 
+/* 中文：Radar 按钮“呼吸”动画；English: breathing animation for Radar button */
+[data-animate="breath"] {
+  animation: breathScale 2.4s ease-in-out infinite;
+}
+
+@keyframes breathScale {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+/* 中文：Hero 主按钮更强的呼吸动效（幅度稍大，节奏稍快）
+   English: Stronger breathing for primary Hero buttons */
+[data-animate="breath-hero"] {
+  animation: breathScaleHero 2s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes breathScaleHero {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
+
+/* 中文：About 卡片在小屏幕（<= 400px）下的安全内边距，避免被边缘裁切
+   English: Safe padding for About card on small screens to avoid clipping */
+@media (max-width: 400px) {
+  .about-safe {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
 
 @layer base {
   * {

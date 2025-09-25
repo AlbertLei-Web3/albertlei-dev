@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import React, { useEffect, useMemo, useState } from "react";
 import TechRadar from "./TechRadar";
 import type { Project } from "./ProjectCard";
 
@@ -88,7 +87,7 @@ export default function TechStackBento({
   }, [projects, aliasMap, maxItems, roleSkills]);
 
   // 角色配色（与 Hero 徽章对应）
-  const palette = useMemo(() => ({
+  const palette = useMemo<Record<string, string>>(() => ({
     "Web3 × AI": "emerald",
     "Founder": "rose",
     "Full-Stack Developer": "amber",
@@ -209,6 +208,16 @@ export default function TechStackBento({
 
   const [view, setView] = useState<"chips" | "radar">("chips");
   const [compareAll, setCompareAll] = useState<boolean>(false);
+  // 中文：小屏（<800px）时，限制 Chips 只显示两行；点击 View more 展开
+  // English: On narrow screens (<800px), show only 2 rows of chips; expand with View more
+  const [isNarrow, setIsNarrow] = useState<boolean>(false);
+  const [chipsExpanded, setChipsExpanded] = useState<boolean>(false);
+  useEffect(() => {
+    const detect = () => setIsNarrow(typeof window !== 'undefined' && window.innerWidth < 800);
+    detect();
+    window.addEventListener('resize', detect);
+    return () => window.removeEventListener('resize', detect);
+  }, []);
   // Radar 按钮固定亮青色主题（更显眼的霓虹青）
   const radarHex = "#22E1FF"; // neon-cyan
   const radarBtnStyle = {
@@ -224,13 +233,13 @@ export default function TechStackBento({
   return (
     <div className="space-y-4">
       {/* Tabs + 视图切换按钮 */}
-      <div className="flex items-center justify-start gap-2 overflow-visible">
-        <div className="flex items-center gap-2 overflow-x-auto overflow-y-visible py-1.5 px-2 md:px-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex flex-wrap md:flex-nowrap items-center justify-start gap-2 overflow-visible">
+        <div className="flex flex-wrap md:flex-nowrap items-center gap-2 py-1.5 px-2 md:px-3">
           {rolesOrder.map((r) => (
             <button
               key={r}
               onClick={() => setTabRole(r)}
-              className={`group relative whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-transform duration-150 hover:scale-[1.05] active:scale-95 ${tabRole === r ? 'ring-1 ring-white/30' : 'opacity-95 hover:opacity-100'}`}
+              className={`group relative shrink-0 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-transform duration-150 hover:scale-[1.05] active:scale-95 ${tabRole === r ? 'ring-1 ring-white/30' : 'opacity-95 hover:opacity-100'}`}
               style={chipStyle(r)}
               aria-pressed={tabRole === r}
             >
@@ -243,11 +252,18 @@ export default function TechStackBento({
           ))}
         </div>
         {/* 删除右上重复的角色标签，仅保留切换按钮 */}
+        {/**
+         * 中文：为“Radar”按钮加入“呼吸”动画（自动放大-缩小循环），
+         *       悬停时仍可额外轻微放大；减速曲线使用 easeInOut，更自然。
+         * English: Add a breathing animation (auto scale up/down loop) to the
+         *          "Radar" button. Hover still adds a slight extra zoom.
+         */}
         <button
           onClick={() => setView((v) => (v === "chips" ? "radar" : "chips"))}
-          className="group relative ml-auto inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-transform duration-150 hover:scale-110 active:scale-95"
+          className="group relative md:ml-auto mt-2 md:mt-0 shrink-0 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-transform duration-150 hover:scale-110 active:scale-95"
           style={radarBtnStyle}
           aria-label="Toggle skills view"
+          data-animate="breath"
         >
           <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100" style={{ boxShadow: `0 0 32px ${hexToRgba(radarHex, 0.75)}` }} aria-hidden />
           <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
@@ -264,26 +280,22 @@ export default function TechStackBento({
 
       {/* Bento Chips with animation */}
       {view === "chips" && (
-      <AnimatePresence mode="popLayout">
-        <motion.div
+        <div
           key={tabRole}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -8 }}
-          transition={{ duration: 0.18 }}
           className="grid grid-cols-2 gap-2.5 md:grid-cols-3 xl:grid-cols-4"
           aria-live="polite"
         >
-          {displaySkills.map((skill) => (
-            <motion.div
+          {(() => {
+            const cols = isNarrow ? 2 : 0; // small screens use 2 columns defined in class
+            const maxRows = 2;
+            const limit = isNarrow && !chipsExpanded ? cols * maxRows : displaySkills.length;
+            const list = displaySkills.slice(0, limit);
+            return list.map((skill) => (
+            <div
               key={skill}
-              layout
               className="rounded-xl border px-3.5 py-2.5 text-[13px] font-medium"
               style={chipStyle(tabRole)}
               title={skill}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.15 }}
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="truncate">{skill}</span>
@@ -294,7 +306,7 @@ export default function TechStackBento({
               </div>
               {(() => {
                 const pct = getSkillPercent(skill);
-                const hue = palette[tabRole] || "amber";
+                const hue = (palette as Record<string, string>)[tabRole] || "amber";
                 const base = hueColorMap[hue] || "#22E1FF";
                 return (
                   <div className="mt-1 h-1.5 w-full rounded-full bg-white/18">
@@ -308,13 +320,24 @@ export default function TechStackBento({
                   </div>
                 );
               })()}
-            </motion.div>
-          ))}
+            </div>
+            ));
+          })()}
+          {isNarrow && displaySkills.length > 4 && (
+            <div className="col-span-full mt-1 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setChipsExpanded((v) => !v)}
+                className="rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-semibold text-white/90 hover:bg-white/15 active:scale-95 transition"
+              >
+                {chipsExpanded ? 'View less' : 'View more'}
+              </button>
+            </div>
+          )}
           {displaySkills.length === 0 && (
             <div className="col-span-full text-sm text-white/60">No skills found for this role.</div>
           )}
-        </motion.div>
-      </AnimatePresence>
+        </div>
       )}
 
       {view === "radar" && (
@@ -355,7 +378,9 @@ export default function TechStackBento({
                   } as Record<string, string>)[tabRole] || "#22E1FF",
               },
             ]}
-            size={380}
+            // 中文：在手机视口下自动收缩，避免 400x800 时溢出
+            // English: shrink on small viewport to avoid overflow at 400x800
+            size={340}
           />
         </div>
       )}
