@@ -11,7 +11,8 @@
  * - Use real email and social links; add icons for GitHub / X / LinkedIn / Email / WeChat;
  * - Hover animation and accessibility (aria-label).
  */
-import { Mail, Github, Linkedin, Twitter } from "lucide-react";
+import React, { useState, useCallback, useEffect } from "react";
+import { Mail, Github, Linkedin, Twitter, X as CloseIcon } from "lucide-react";
 
 // 中文：简单的微信图标（内联 SVG），避免额外依赖；
 // English: Minimal WeChat icon (inline SVG) to avoid extra dependency.
@@ -37,6 +38,26 @@ function WeChatIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function Footer() {
+  // 中文：控制微信弹窗的可见性
+  // English: Control visibility of the WeChat modal
+  const [isWeChatOpen, setIsWeChatOpen] = useState(false);
+
+  // 中文：快捷方法，打开/关闭
+  // English: Helpers to open/close
+  const openWeChat = useCallback(() => setIsWeChatOpen(true), []);
+  const closeWeChat = useCallback(() => setIsWeChatOpen(false), []);
+
+  // 中文：键盘可访问性——按下 ESC 关闭弹窗
+  // English: Keyboard a11y — close modal on ESC key
+  useEffect(() => {
+    if (!isWeChatOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeWeChat();
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [isWeChatOpen, closeWeChat]);
+
   // 中文：社交与联系方式数据（单一可信来源，便于维护）
   // English: Single source of truth for socials and contact links.
   const socialLinks = [
@@ -65,12 +86,16 @@ export function Footer() {
       ariaLabel: "LinkedIn profile",
     },
     {
-      // 中文：微信以手机号呈现；为了可点击性，这里使用 tel:，也可改为展示纯文本
-      // English: Show WeChat as phone number; use tel: for clickability; can switch to plain text.
-      href: "tel:17743267863",
+      // 中文：微信使用弹窗显示二维码图片，因此 href 设为 # 并绑定 onClick
+      // English: WeChat opens a modal with QR image; set href to # and use onClick
+      href: "#",
       label: "WeChat",
       icon: <WeChatIcon />,
       ariaLabel: "WeChat: 17743267863",
+      onClick: (e: React.MouseEvent) => {
+        e.preventDefault();
+        openWeChat();
+      },
     },
   ];
 
@@ -111,6 +136,7 @@ export function Footer() {
               aria-label={s.ariaLabel}
               target={s.href.startsWith("http") ? "_blank" : undefined}
               rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
+              onClick={(s as any).onClick}
             >
               <span
                 className="inline-flex items-center gap-2 rounded-md px-3 py-2 text-white/85 hover:bg-white/5 transition-transform duration-200 hover:scale-[1.06]"
@@ -126,6 +152,47 @@ export function Footer() {
         © {new Date().getFullYear()} Albert Lei. All rights reserved.
       </p>
       </footer>
+      {/**
+       * 中文：微信弹窗（覆盖层 + 卡片）。
+       * English: WeChat modal (overlay + card).
+       */}
+      {isWeChatOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          aria-label="WeChat QR"
+          onClick={closeWeChat}
+        >
+          {/**
+           * 中文：阻止点击卡片内容时冒泡到遮罩，避免误关闭。
+           * English: Stop propagation so clicks inside the card do not close the modal.
+           */}
+          <div
+            className="glass relative mx-4 w-full max-w-sm rounded-lg p-4 text-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              className="absolute right-2 top-2 rounded-md p-1 text-white/80 hover:bg-white/10"
+              aria-label="Close"
+              onClick={closeWeChat}
+            >
+              <CloseIcon size={18} />
+            </button>
+            {/**
+             * 中文：展示 public/wechat.png；Next.js 的 public 目录可直接用根路径引用。
+             * English: Display public/wechat.png; Next.js public assets are available at root path.
+             */}
+            <img
+              src="/wechat.png"
+              alt="WeChat QR Code"
+              className="mx-auto h-auto max-h-[70vh] w-full rounded-md object-contain"
+            />
+            <p className="mt-3 text-sm text-white/70">WeChat: 17743267863</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
