@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import TechRadar from "./TechRadar";
 import type { Project } from "./ProjectCard";
+import {useTranslations} from 'next-intl';
 
 /**
  * 中文（初学者友好）：
@@ -34,6 +35,7 @@ export default function TechStackBento({
    */
   rolePalette?: Record<string, string>;
 }) {
+  const tRadar = useTranslations('radar');
   // 归一化别名，合并同义标签
   const aliasMap: Record<string, string> = useMemo(
     () => ({
@@ -274,7 +276,7 @@ export default function TechStackBento({
               <polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="currentColor" />
             )}
           </svg>
-          {view === "chips" ? "Radar" : "Chips"}
+          {view === "chips" ? tRadar('toggle.to_radar') : tRadar('toggle.to_chips')}
         </button>
       </div>
 
@@ -342,16 +344,24 @@ export default function TechStackBento({
 
       {view === "radar" && (
         <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
-          {/* 图例（Compare All 模式） */}
-          {/* Compare 图例移除，避免右上重复展示 */}
+          {/* 标题：《能力图》/Skills Map */}
+          <div className="mb-2 text-sm text-white/85">{tRadar('title')}</div>
           <TechRadar
             axes={[
-              "Frontend",
-              "Blockchain",
-              "Data & AI Services",
-              "Infra & DevOps",
-              "PM & Collaboration",
-              "Business",
+              'Frontend',
+              'Blockchain',
+              'Data & AI Services',
+              'Infra & DevOps',
+              'PM & Collaboration',
+              'Business',
+            ]}
+            displayAxes={[
+              tRadar('axes.frontend'),
+              tRadar('axes.blockchain'),
+              tRadar('axes.data'),
+              tRadar('axes.infra'),
+              tRadar('axes.pm'),
+              tRadar('axes.biz')
             ]}
             series={compareAll ? [
               { label:'Web3 × AI', colorHex:'#10B981', values:{ Frontend:85, Blockchain:75, 'Data & AI Services':70, 'Infra & DevOps':60, 'PM & Collaboration':80, Business:65 } },

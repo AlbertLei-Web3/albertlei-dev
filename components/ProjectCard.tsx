@@ -13,6 +13,7 @@
  */
 import { motion } from "framer-motion";
 import { useState } from "react";
+import {useTranslations, useMessages} from 'next-intl';
 import ProjectModal from "./ProjectModal";
 
 // 中文：为了解决某些类型推断在项目环境下对 motion.* 的 HTML 属性兼容性问题
@@ -45,6 +46,14 @@ export function ProjectCard({ project }: { project: Project }) {
   // 中文：小屏(≤800px)下控制标签是否展开
   // English: controls whether tags are expanded on small screens (≤800px)
   const [tagsExpanded, setTagsExpanded] = useState(false);
+
+  // 中文：项目卡片标题/描述的国际化回退：messages.projectItems[project.id]
+  // English: i18n fallback for title/description via messages.projectItems[project.id]
+  const messages = useMessages() as any;
+  const localized = messages?.projectItems?.[project.id];
+  const displayTitle = (localized && localized.title) ? localized.title : project.title;
+  const displayDesc = (localized && localized.description) ? localized.description : project.description;
+  const tCard = (useTranslations('projects.card')) as any;
 
   // 中文：若未提供 poster，尝试为常见外链源自动生成缩略图（YouTube / Google Drive）
   // English: auto-generate thumbnail for common providers if poster is missing
@@ -114,8 +123,8 @@ export function ProjectCard({ project }: { project: Project }) {
 
         {/* 文本与标签/按钮 Text + tags/actions */}
         <div className="space-y-3 px-4 py-4">
-          <h3 className="text-lg font-semibold">{project.title}</h3>
-          <p className="text-sm text-white/75 line-clamp-2">{project.description}</p>
+          <h3 className="text-lg font-semibold">{displayTitle}</h3>
+          <p className="text-sm text-white/75 line-clamp-2">{displayDesc}</p>
 
           {/* Tags on card */}
           {project.tags && project.tags.length > 0 && (
@@ -163,7 +172,7 @@ export function ProjectCard({ project }: { project: Project }) {
                     }}
                     className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/90 ring-1 ring-white/15 hover:bg-white/15"
                   >
-                    {tagsExpanded ? "View less" : "View more"}
+                    {tagsExpanded ? tCard('tags_less') : tCard('tags_more')}
                   </button>
                 </div>
               )}
@@ -187,7 +196,7 @@ export function ProjectCard({ project }: { project: Project }) {
                     <path d="M12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9Z" stroke="currentColor" strokeWidth="1.5"/>
                     <path d="M3 12h18M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.5-4-9s1.5-6.5 4-9Z" stroke="currentColor" strokeWidth="1.5"/>
                   </svg>
-                  Website
+                  {tCard('website')}
                 </a>
               )}
               {project.repoUrl && (
@@ -203,7 +212,7 @@ export function ProjectCard({ project }: { project: Project }) {
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                     <path d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.61-4.04-1.61-.55-1.41-1.34-1.79-1.34-1.79-1.1-.75.08-.73.08-.73 1.22.09 1.86 1.25 1.86 1.25 1.08 1.85 2.84 1.31 3.53 1 .11-.79.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.31.47-2.39 1.24-3.24-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.24 2.87.12 3.17.77.85 1.24 1.93 1.24 3.24 0 4.62-2.8 5.65-5.47 5.95.43.37.82 1.1.82 2.23v3.3c0 .32.22.7.82.58A12 12 0 0 0 12 .5Z"/>
                   </svg>
-                  GitHub
+                  {tCard('github')}
                 </a>
               )}
             </div>

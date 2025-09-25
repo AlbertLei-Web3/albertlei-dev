@@ -12,10 +12,16 @@ export default function TechRadar({
   axes,
   series,
   size = 360,
+  displayAxes,
 }: {
   axes: string[];
   series: RadarSeries[];
   size?: number;
+  /**
+   * 中文：用于显示的坐标轴文本；与 axes 长度一致，仅用于渲染，不参与取值。
+   * English: Optional display labels for axes; same length as axes; used only for rendering.
+   */
+  displayAxes?: string[];
 }) {
   // 中文：响应式尺寸：根据外层容器宽度动态取最小值，避免在 400x800 下溢出
   // English: Responsive chart size based on container width to avoid overflow on 400x800
@@ -132,7 +138,7 @@ export default function TechRadar({
               textAnchor={Math.cos(a) > 0.1 ? "start" : Math.cos(a) < -0.1 ? "end" : "middle"}
               dominantBaseline="middle"
             >
-              {ax}
+              {displayAxes && displayAxes[i] ? displayAxes[i] : ax}
             </text>
           );
         })}

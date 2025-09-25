@@ -12,6 +12,7 @@
  * - Tune initial visible count and increment via props
  */
 import React, { useMemo, useState } from "react";
+import {useTranslations} from 'next-intl';
 import { ProjectCard, type Project } from "./ProjectCard";
 import ProjectCardSkeleton from "./ProjectCardSkeleton";
 
@@ -24,6 +25,8 @@ export default function ProjectsSection({
   initialVisible?: number;
   increment?: number;
 }) {
+  // 中文：项目区文案国际化；English: i18n for Projects section
+  const t = useTranslations('projects');
   const safeInitial = Math.max(1, Math.floor(initialVisible));
   const step = Math.max(1, Math.floor(increment));
   const [visible, setVisible] = useState<number>(safeInitial);
@@ -37,8 +40,8 @@ export default function ProjectsSection({
     <section id="projects" className="mt-14">
       {/* 标题行 Header */}
       <div className="mb-6 flex items-end justify-between">
-        <h2 className="neon-text text-xl font-bold">Projects</h2>
-        <span className="text-xs text-white/60">Videos are responsive, ideally 16:9.</span>
+        <h2 className="neon-text text-xl font-bold">{t('title')}</h2>
+        <span className="text-xs text-white/60">{t('videos_tip')}</span>
       </div>
 
       {/* 内容区 Content */}
@@ -63,7 +66,7 @@ export default function ProjectsSection({
                 onClick={() => setVisible((v) => Math.min(projects.length, v + step))}
                 className="rounded-full bg-neon-cyan/20 px-5 py-2 text-sm font-semibold text-white ring-1 ring-white/10 shadow-neonCyan hover:bg-neon-cyan/30 transition-transform hover:scale-[1.03] active:scale-[0.98]"
               >
-                View more
+                {t('view_more')}
               </button>
             )}
             {canShowLess && (
@@ -71,7 +74,7 @@ export default function ProjectsSection({
                 onClick={() => setVisible(safeInitial)}
                 className="rounded-full bg-white/10 px-5 py-2 text-sm font-semibold text-white/90 ring-1 ring-white/10 hover:bg-white/15 transition-transform hover:scale-[1.03] active:scale-[0.98]"
               >
-                View less
+                {t('view_less')}
               </button>
             )}
           </div>

@@ -13,8 +13,16 @@
  */
 import { motion } from "framer-motion";
 import PillNav from "./PillNav";
+import {useTranslations, useLocale} from 'next-intl';
+import LocaleToggle from './LocaleToggle';
 
 export function NavBar() {
+  // 中文：读取当前语言与文案；English: read current locale and translations
+  const t = useTranslations('nav');
+  const tHero = useTranslations('hero');
+  const locale = useLocale();
+  const base = `/${locale}`; // 语言前缀 locale prefix
+
   return (
     <div className="sticky top-0 z-40">
       <motion.div
@@ -26,12 +34,12 @@ export function NavBar() {
         <div className="hidden sm:flex mx-auto max-w-7xl px-4 py-4 justify-center">
           <PillNav
             logo="/logo.svg" // SVG logo with neon styling
-            logoAlt="Albert Lei"
+            logoAlt={tHero('name')}
             items={[
-              { href: "/", label: "HOME" },
-              { href: "#about", label: "ABOUT" },
-              { href: "#projects", label: "PROJECTS" },
-              { href: "#contact", label: "CONTACT" },
+              { href: `${base}`, label: t('home') },
+              { href: `${base}#about`, label: t('about') },
+              { href: `${base}#projects`, label: t('projects') },
+              { href: `${base}#contact`, label: t('contact') },
             ]}
             baseColor="#0a0f1f" // 深色背景
             pillColor="rgba(34, 225, 255, 0.1)" // 半透明霓虹青色背景
@@ -45,21 +53,22 @@ export function NavBar() {
           <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto w-[92%] rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md px-3 py-2 shadow-[0_0_18px_rgba(34,225,255,0.25)]">
             <ul className="grid grid-cols-4 text-[12px] font-semibold text-white/90">
               {[
-                { href: "/", label: "Home" },
-                { href: "#about", label: "About" },
-                { href: "#projects", label: "Work" },
-                { href: "#contact", label: "Contact" },
+                { href: `${base}`, label: t('home_m') },
+                { href: `${base}#about`, label: t('about_m') },
+                { href: `${base}#projects`, label: t('projects_m') },
+                { href: `${base}#contact`, label: t('contact_m') },
               ].map((i) => (
                 <li key={i.label} className="flex items-center justify-center">
                   <a
                     href={i.href}
                     className="inline-flex items-center justify-center rounded-lg px-2 py-1.5 hover:bg-white/10 active:scale-95 transition"
                     onClick={(e) => {
-                      if (i.href.startsWith('#')) {
+                      if (i.href.includes('#')) {
                         e.preventDefault();
-                        const el = document.getElementById(i.href.slice(1));
+                        const id = i.href.split('#')[1];
+                        const el = document.getElementById(id);
                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        else location.hash = i.href;
+                        else location.assign(i.href);
                       }
                     }}
                   >
@@ -69,6 +78,11 @@ export function NavBar() {
               ))}
             </ul>
           </nav>
+        </div>
+
+        {/* 语言切换器：保留路径/查询/锚点 */}
+        <div className="absolute right-4 top-2 hidden sm:flex gap-2">
+          <LocaleToggle />
         </div>
       </motion.div>
     </div>

@@ -1,0 +1,127 @@
+{
+  "meta": {
+    "title": "雷雨奇 — Web3 与 AI 项目 | 霓虹作品集",
+    "description": "雷雨奇的 Web3 与 AI 项目展示。"
+  },
+  "nav": {
+    "home": "首页",
+    "about": "关于",
+    "projects": "项目",
+    "contact": "联系",
+    "home_m": "首页",
+    "about_m": "关于",
+    "projects_m": "作品",
+    "contact_m": "联系"
+  },
+  "hero": {
+    "h1a": "持续进化，",
+    "h1b": "不被定义",
+    "roles": {
+      "web3ai": "Web3 × AI",
+      "founder": "创始人",
+      "fullstack": "全栈开发",
+      "pm": "项目经理"
+    },
+    "tagline": "打造下一代去中心化与智能应用",
+    "intro": "专注链上应用、Web3 协议与 AI 驱动的产品原型，兼顾高品质体验与未来视觉；持续探索前沿技术如何服务真实的人类体验。",
+    "viewProjects": "查看项目",
+    "contact": "联系我",
+    "name": "雷雨奇",
+    "title": "Web3 × AI 开发者",
+    "handle": "Lei_Yuqi",
+    "status": "在线"
+  },
+  "projects": {
+    "title": "项目",
+    "videos_tip": "视频为响应式，最佳为 16:9。",
+    "view_more": "展开更多",
+    "view_less": "收起",
+    "card": {
+      "website": "官网",
+      "github": "GitHub",
+      "tags_more": "展开更多",
+      "tags_less": "收起"
+    },
+    "modal": {
+      "close": "关闭",
+      "more": "这里将展示更详细的项目信息。可在 Project 对象中补充 longDescription、tags、repoUrl 与 demoUrl。",
+      "website": "官网",
+      "source": "源码"
+    }
+  },
+  "about": {
+    "title": "关于",
+    "skills": "技能",
+    "roles": {
+      "web3ai": "Web3 × AI",
+      "founder": "创始人",
+      "fullstack": "全栈开发",
+      "pm": "项目经理"
+    },
+    "capabilities": {
+      "founder": [
+        "产品设计（Figma、Notion、流程图）",
+        "商业模型设计",
+        "生态合作伙伴",
+        "黑客松原型孵化",
+        "团队管理",
+        "远程协作",
+        "快速迭代",
+        "演示视频制作",
+        "路演稿（Pitch Deck）"
+      ],
+      "pm": [
+        "Jira",
+        "Notion",
+        "Linear",
+        "跨区域远程协作",
+        "Slack",
+        "Discord",
+        "干系人管理",
+        "交付治理",
+        "分析看板",
+        "用户反馈闭环"
+      ]
+    }
+  },
+  "radar": {
+    "title": "《能力图》",
+    "toggle": {
+      "to_radar": "能力图",
+      "to_chips": "技能卡"
+    },
+    "axes": {
+      "frontend": "前端",
+      "blockchain": "区块链",
+      "data": "数据与 AI 服务",
+      "infra": "基础设施与运维",
+      "pm": "项目管理与协作",
+      "biz": "商务"
+    }
+  }
+  ,
+  "projectItems": {
+    "yt-akgktekzgn8": {
+      "title": "Somnia DeFi 钱包",
+      "description": "基于 ERC-4337 的智能钱包项目。",
+      "longDescription": "Somnia DeFi 钱包基于账号抽象（Account Abstraction），为 Somnia DeFi Mini Hackathon 构建；由 4 个核心微服务模块协作，提供安全便捷的去中心化金融体验。"
+    },
+    "yt-0gGCtpkIk_A": {
+      "title": "FanForce AI",
+      "description": "将大众体育与 Web3 激励结合的链上平台。",
+      "longDescription": "FanForce 融合现实大众体育与 Web3 激励机制，包含管理员、推广大使、运动员、观众四类角色；通过去中心化治理增强草根体育生态，并内置 AI 驱动的 DeFi 收益引擎。"
+    },
+    "yt-5tw3ut8hd2g": {
+      "title": "SomniFlow",
+      "description": "重构 Web3 新手引导。",
+      "longDescription": "SomniFlow 让用户仅用邮箱与设备生物特征在约 30 秒内直达 DeFi，无需助记词、插件与 Gas。"
+    },
+    "gdrive-12kv0sPD": {
+      "title": "AIHarvest",
+      "description": "支持兑换、做市与收益农场的 DeFi 平台。",
+      "longDescription": "AIHarvest 提供代币兑换、流动性提供与收益农场能力。"
+    }
+  }
+}
+
+

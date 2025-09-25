@@ -14,8 +14,11 @@
 import { motion } from "framer-motion";
 import ProfileCard from "./ProfileCard";
 import React from "react";
+import {useTranslations} from 'next-intl';
 
 export function Hero() {
+  // 中文：Hero 文案国际化；English: i18n for Hero texts
+  const t = useTranslations('hero');
   return (
     <section className="relative mx-auto max-w-7xl px-4 pt-10 md:pt-16">
       
@@ -42,10 +45,10 @@ export function Hero() {
            */}
           <h1 className="neon-text text-3xl font-extrabold tracking-tight leading-[1.32] md:text-5xl md:leading-[1.22] overflow-visible">
             <span className="block bg-gradient-to-r from-white via-white to-neon-cyan/80 bg-clip-text text-transparent mb-2 md:mb-3">
-              Always Evolving,
+              {t('h1a')}
             </span>
             <span className="block bg-gradient-to-r from-neon-cyan/90 via-white to-white bg-clip-text text-transparent">
-              Never Defined
+              {t('h1b')}
             </span>
           </h1>
 
@@ -59,16 +62,16 @@ export function Hero() {
              * English: Color-code role badges for quick visual parsing; colors match semantics.
              */}
             <span className="glass px-3 py-1 text-sm font-medium text-emerald-300 bg-emerald-500/10 ring-1 ring-emerald-400/25">
-              Web3 × AI
+              {t('roles.web3ai')}
             </span>
             <span className="glass px-3 py-1 text-sm font-medium text-rose-300 bg-rose-500/10 ring-1 ring-rose-400/25">
-              Founder
+              {t('roles.founder')}
             </span>
             <span className="glass px-3 py-1 text-sm font-medium text-amber-300 bg-amber-500/10 ring-1 ring-amber-400/25">
-              Full-Stack Developer
+              {t('roles.fullstack')}
             </span>
             <span className="glass px-3 py-1 text-sm font-medium text-indigo-300 bg-indigo-500/10 ring-1 ring-indigo-400/25">
-              Project Manager
+              {t('roles.pm')}
             </span>
           </div>
 
@@ -76,18 +79,13 @@ export function Hero() {
            * 中文：一句话标语，独立成行，避免与标题混排导致视觉拥挤
            * English: One-line tagline separated from heading for cleaner layout
            */}
-          <p className="text-base text-white/70 md:text-lg">
-            Build the next‑gen decentralized & intelligent apps
-          </p>
+          <p className="text-base text-white/70 md:text-lg">{t('tagline')}</p>
 
           {/**
            * 中文：两句式简介，控制行宽（max-w-prose）提升阅读体验
            * English: Two-sentence intro with controlled measure (max-w-prose) for readability
            */}
-          <p className="max-w-prose text-white/80">
-            Focused on on-chain apps, Web3 protocols, and AI‑powered product prototyping with premium UX and futuristic visuals.
-            Relentlessly exploring how frontier technology can serve real‑world human experiences.
-          </p>
+          <p className="max-w-prose text-white/80">{t('intro')}</p>
 
 	      {/**
 	       * 中文：根据你的要求已删除“技能标签（Tech badges）”区块。
@@ -103,7 +101,7 @@ export function Hero() {
                          transition-transform hover:scale-105 active:scale-98"
               data-animate="breath-hero"
             >
-              View Projects
+              {t('viewProjects')}
             </a>
 
             <a
@@ -125,7 +123,7 @@ export function Hero() {
                          transition-transform hover:scale-105 active:scale-98"
               data-animate="breath-hero"
             >
-              Get in Touch
+              {t('contact')}
             </a>
           </div>
         </div>
@@ -134,11 +132,11 @@ export function Hero() {
         <div className="relative [@media(orientation:landscape)_and_(max-width:900px)]:hidden">
           <ProfileCard
             avatarUrl="/avatar.jpg"
-            name="Albert Lei"
-            title="Web3 × AI Developer"
-            handle="Albert_Lei"
-            status="Online"
-            contactText="Get in Touch"
+            name={t('name')}
+            title={t('title')}
+            handle={t('handle')}
+            status={t('status')}
+            contactText={t('contact')}
             showUserInfo={true}
             enableTilt={true}
             enableMobileTilt={true}
