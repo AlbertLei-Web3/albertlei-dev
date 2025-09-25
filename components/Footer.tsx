@@ -12,7 +12,7 @@
  * - Hover animation and accessibility (aria-label).
  */
 import React, { useState, useCallback, useEffect } from "react";
-import { Mail, Github, Linkedin, Twitter, X as CloseIcon } from "lucide-react";
+import { Mail, Github, Linkedin, X as CloseIcon, Send } from "lucide-react";
 
 // 中文：简单的微信图标（内联 SVG），避免额外依赖；
 // English: Minimal WeChat icon (inline SVG) to avoid extra dependency.
@@ -33,6 +33,27 @@ function WeChatIcon(props: React.SVGProps<SVGSVGElement>) {
       <circle cx="21" cy="19" r="1.8" fill="#fff" />
       <circle cx="28" cy="25" r="2" fill="#fff" />
       <circle cx="36" cy="25" r="2" fill="#fff" />
+    </svg>
+  );
+}
+
+// 中文：X（原 Twitter）品牌图标（内联 SVG）；避免外部依赖，并保持清晰的“X”外形。
+// English: X (formerly Twitter) brand icon as inline SVG; no external deps, clean brand "X" shape.
+function XLogoIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width={20}
+      height={20}
+      aria-hidden="true"
+      focusable="false"
+      {...props}
+    >
+      {/* Simple X mark resembling X brand */}
+      <path
+        fill="currentColor"
+        d="M2.5 2.5h4.3l6.1 7.9 6.2-7.9h2.6l-7.4 9.5 7.9 9.5h-4.3l-6.6-8.1-6.3 8.1H2.9l7.7-9.8-8.1-9.2Z"
+      />
     </svg>
   );
 }
@@ -76,7 +97,7 @@ export function Footer() {
     {
       href: "https://x.com/Web3preacherLei",
       label: "X",
-      icon: <Twitter size={20} aria-hidden={true} />,
+      icon: <XLogoIcon />,
       ariaLabel: "X (Twitter): @Web3preacherLei",
     },
     {
@@ -84,6 +105,14 @@ export function Footer() {
       label: "LinkedIn",
       icon: <Linkedin size={20} aria-hidden={true} />,
       ariaLabel: "LinkedIn profile",
+    },
+    {
+      // 中文：Telegram 链接，使用纸飞机图标
+      // English: Telegram link with paper plane icon
+      href: "https://t.me/Web3preacherLei",
+      label: "Telegram",
+      icon: <Send size={20} aria-hidden={true} />,
+      ariaLabel: "Telegram: @Web3preacherLei",
     },
     {
       // 中文：微信使用弹窗显示二维码图片，因此 href 设为 # 并绑定 onClick
