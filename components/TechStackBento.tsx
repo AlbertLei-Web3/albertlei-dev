@@ -209,20 +209,32 @@ export default function TechStackBento({
 
   const [view, setView] = useState<"chips" | "radar">("chips");
   const [compareAll, setCompareAll] = useState<boolean>(false);
+  // Radar 按钮固定亮青色主题（更显眼的霓虹青）
+  const radarHex = "#22E1FF"; // neon-cyan
+  const radarBtnStyle = {
+    background: `linear-gradient(135deg, ${hexToRgba(radarHex, 0.22)} 0%, ${hexToRgba(
+      radarHex,
+      0.36
+    )} 100%)`,
+    borderColor: hexToRgba(radarHex, 0.65),
+    color: "rgba(255,255,255,0.95)",
+    boxShadow: `0 0 26px ${hexToRgba(radarHex, 0.6)}`,
+  } as React.CSSProperties;
 
   return (
     <div className="space-y-4">
       {/* Tabs + 视图切换按钮 */}
-      <div className="flex items-center justify-start gap-2">
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="flex items-center justify-start gap-2 overflow-visible">
+        <div className="flex items-center gap-2 overflow-x-auto overflow-y-visible py-1.5 px-2 md:px-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {rolesOrder.map((r) => (
             <button
               key={r}
               onClick={() => setTabRole(r)}
-              className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors ${tabRole === r ? 'ring-1 ring-white/30 scale-[1.02]' : 'opacity-90 hover:opacity-100'}`}
+              className={`group relative whitespace-nowrap rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-transform duration-150 hover:scale-[1.05] active:scale-95 ${tabRole === r ? 'ring-1 ring-white/30' : 'opacity-95 hover:opacity-100'}`}
               style={chipStyle(r)}
               aria-pressed={tabRole === r}
             >
+              <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100" style={{ boxShadow: `0 0 22px ${hexToRgba((hueColorMap[palette[r] || 'amber'] || '#22E1FF'), 0.55)}` }} aria-hidden />
               {r}
               <span className="ml-1 inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] align-middle">
                 {roleCounts[r] ?? 0}
@@ -233,8 +245,19 @@ export default function TechStackBento({
         {/* 删除右上重复的角色标签，仅保留切换按钮 */}
         <button
           onClick={() => setView((v) => (v === "chips" ? "radar" : "chips"))}
-          className="ml-auto rounded-full border px-3 py-1 text-xs font-semibold text-white/90 bg-white/5 ring-1 ring-white/10 hover:bg-white/10"
+          className="group relative ml-auto inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-transform duration-150 hover:scale-110 active:scale-95"
+          style={radarBtnStyle}
+          aria-label="Toggle skills view"
         >
+          <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100" style={{ boxShadow: `0 0 32px ${hexToRgba(radarHex, 0.75)}` }} aria-hidden />
+          <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+            {/* 六边形指示图标：Chips->描边，Radar->填充 */}
+            {view === 'chips' ? (
+              <polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="none" stroke="currentColor" strokeWidth="1.6" />
+            ) : (
+              <polygon points="12,2 21,7 21,17 12,22 3,17 3,7" fill="currentColor" />
+            )}
+          </svg>
           {view === "chips" ? "Radar" : "Chips"}
         </button>
       </div>
