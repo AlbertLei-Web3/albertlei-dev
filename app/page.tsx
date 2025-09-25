@@ -11,6 +11,8 @@
  */
 import { NavBar } from "@/components/NavBar";
 import { Hero } from "@/components/Hero";
+import TechStackMeter from "@/components/TechStackMeter";
+import TechStackBento from "@/components/TechStackBento";
 import { ProjectCard, type Project } from "@/components/ProjectCard";
 import ProjectsSection from "@/components/ProjectsSection";
 import { Footer } from "@/components/Footer";
@@ -93,24 +95,29 @@ export default function HomePage() {
       <main className="mx-auto max-w-7xl px-4">
         <Hero />
 
-        {/* About Section */}
-        <section
-          id="about"
-          className="mt-14 grid gap-6 rounded-2xl bg-white/5 p-6 ring-1 ring-white/10 md:grid-cols-3"
-        >
-          <div>
-            <h2 className="neon-text text-xl font-bold">About</h2>
-          </div>
-          <div className="md:col-span-2">
-            <p className="text-white/80">
-              Passionate about Web3 and AI, I explore new HCI patterns and value flows,
-              focusing on 0-to-1 product discovery and shipping polished experiences.
-            </p>
-          </div>
-        </section>
-
         {/* Projects Section with View more */}
         <ProjectsSection projects={projects} initialVisible={3} increment={3} />
+
+        {/* About Section */}
+        {/**
+         * 中文（初学者友好）：
+         * - 按你的要求，将 "About" 标题置于卡片上方；
+         * - 删除文字描述，仅保留技能便当格；
+         * - 取消多列网格，让便当格在容器中满宽铺展。
+         * English (Beginner-friendly):
+         * - Place the "About" heading above the cards;
+         * - Remove paragraph description, keep skills bento only;
+         * - Drop the column grid so the bento fills the container width.
+         */}
+        <section
+          id="about"
+          className="mt-14 rounded-2xl bg-white/5 p-6 ring-1 ring-white/10"
+        >
+          <div className="mb-4">
+            <h2 className="neon-text text-xl font-bold">About</h2>
+          </div>
+          <TechStackBento projects={projects} maxItems={12} title="Skills" />
+        </section>
       </main>
 
       <Footer />

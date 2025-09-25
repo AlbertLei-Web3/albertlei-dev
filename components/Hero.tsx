@@ -88,20 +88,10 @@ export function Hero() {
             Relentlessly exploring how frontier technology can serve real‑world human experiences.
           </p>
 
-          {/* Tech badges */}
-          <div className="flex flex-wrap gap-2">
-            {["Next.js", "TypeScript", "Tailwind", "Framer Motion", "Web3", "AI"].map(
-              (t) => (
-                <span
-                  key={t}
-                  className="glass animate-float px-3 py-1 text-xs text-white/90
-                             transition-transform hover:scale-105"
-                >
-                  {t}
-                </span>
-              )
-            )}
-          </div>
+	      {/**
+	       * 中文：根据你的要求已删除“技能标签（Tech badges）”区块。
+	       * English: Removed the "Tech badges" block per your request.
+	       */}
 
           {/* CTAs */}
           <div className="flex flex-wrap gap-3 pt-2">
