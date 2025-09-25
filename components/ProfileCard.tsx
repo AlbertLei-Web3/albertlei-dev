@@ -312,7 +312,17 @@ const ProfileCardComponent: React.FC<ProfileCardProps> = ({
                   </div>
                   <div className="pc-user-text">
                     <div className="pc-handle">@{handle}</div>
-                    <div className="pc-status">{status}</div>
+                    {/**
+                     * 中文：在状态文本前增加一个小绿点，表示在线；使用 Tailwind 类实现轻微呼吸动画。
+                     * English: Add a small green dot before the status text to indicate online; use Tailwind classes for subtle pulse.
+                     */}
+                    <div className="pc-status flex items-center gap-1.5">
+                      <span
+                        aria-hidden="true"
+                        className="inline-block h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)] animate-pulse"
+                      />
+                      <span>{status}</span>
+                    </div>
                   </div>
                 </div>
                 <button

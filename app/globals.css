@@ -117,6 +117,20 @@ html, body {
 }
 
 
+/* 中文：联系方式高亮动画（短暂发光）；English: short neon glow for contact highlight */
+.contact-glow a span {
+  box-shadow: 0 0 0 0 rgba(34,225,255,0.0);
+  animation: contactGlow 2.2s ease-out;
+}
+
+@keyframes contactGlow {
+  0% { box-shadow: 0 0 0 rgba(34,225,255,0.0); }
+  10% { box-shadow: 0 0 16px rgba(34,225,255,0.6); }
+  30% { box-shadow: 0 0 24px rgba(34,225,255,0.7); }
+  70% { box-shadow: 0 0 14px rgba(34,225,255,0.35); }
+  100% { box-shadow: 0 0 0 rgba(34,225,255,0.0); }
+}
+
 
 @layer base {
   * {

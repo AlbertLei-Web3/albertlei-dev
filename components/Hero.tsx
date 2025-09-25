@@ -13,6 +13,7 @@
  */
 import { motion } from "framer-motion";
 import ProfileCard from "./ProfileCard";
+import React from "react";
 
 export function Hero() {
   return (
@@ -105,12 +106,24 @@ export function Hero() {
             </a>
 
             <a
-              href="#about"
+              href="#contact"
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById('contact');
+                if (el) {
+                  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                  location.hash = '#contact';
+                }
+                if ((window as any).__highlightContactCard) {
+                  setTimeout(() => (window as any).__highlightContactCard(), 350);
+                }
+              }}
               className="rounded-md bg-neon-pink/20 px-4 py-2 text-sm font-medium
                          text-white shadow-neonPink ring-1 ring-white/10 hover:bg-neon-pink/30
                          transition-transform hover:scale-105 active:scale-98"
             >
-              About Me
+              Get in Touch
             </a>
           </div>
         </div>
@@ -129,6 +142,17 @@ export function Hero() {
             enableMobileTilt={true}
             mobileTiltSensitivity={1.5}
             className="w-full max-w-sm mx-auto"
+            onContactClick={() => {
+              const el = document.getElementById('contact');
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              } else {
+                location.hash = '#contact';
+              }
+              if ((window as any).__highlightContactCard) {
+                setTimeout(() => (window as any).__highlightContactCard(), 350);
+              }
+            }}
           />
         </div>
       </div>

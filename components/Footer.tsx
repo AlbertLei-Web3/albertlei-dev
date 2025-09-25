@@ -62,11 +62,22 @@ export function Footer() {
   // 中文：控制微信弹窗的可见性
   // English: Control visibility of the WeChat modal
   const [isWeChatOpen, setIsWeChatOpen] = useState(false);
+  const [highlightContacts, setHighlightContacts] = useState(false);
 
   // 中文：快捷方法，打开/关闭
   // English: Helpers to open/close
   const openWeChat = useCallback(() => setIsWeChatOpen(true), []);
   const closeWeChat = useCallback(() => setIsWeChatOpen(false), []);
+
+  // 中文：暴露一个全局函数，供 Hero 的 CTA 调用以触发“发光高亮”
+  // English: Expose a global function so Hero CTA can trigger contact highlight
+  useEffect(() => {
+    (window as any).__highlightContactCard = () => {
+      setHighlightContacts(true);
+      // 高亮 2.2 秒后自动关闭
+      setTimeout(() => setHighlightContacts(false), 2200);
+    };
+  }, []);
 
   // 中文：键盘可访问性——按下 ESC 关闭弹窗
   // English: Keyboard a11y — close modal on ESC key
@@ -135,7 +146,7 @@ export function Footer() {
        * 中文：将 items-center / text-center 改为 items-start / text-left，使「Contact」位于卡片左上
        * English: Switch to items-start / text-left so the "Contact" title sits at top-left of the card.
        */}
-      <div className="glass flex flex-col items-start gap-3 px-6 py-6 text-left">
+      <div className={`glass flex flex-col items-start gap-3 px-6 py-6 text-left ${highlightContacts ? 'ring-2 ring-neon-cyan/70 shadow-[0_0_24px_rgba(34,225,255,0.6)]' : ''}`}>
         <h4 className="neon-text text-lg font-semibold">Contact</h4>
 
         {/**
@@ -156,7 +167,7 @@ export function Footer() {
          * 中文：社交与通讯入口（带图标）；桌面端 hover 轻微缩放；移动端触控区域更大
          * English: Social/contact entries with icons; subtle hover scale; large touch targets on mobile
          */}
-        <div className="flex flex-wrap items-center justify-start gap-3 text-sm">
+        <div className={`flex flex-wrap items-center justify-start gap-3 text-sm ${highlightContacts ? 'contact-glow' : ''}`}>
           {socialLinks.map((s) => (
             <a
               key={s.label}
