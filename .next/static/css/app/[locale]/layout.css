@@ -1691,6 +1691,9 @@ body{
 .right-2{
   right: 0.5rem;
 }
+.right-3{
+  right: 0.75rem;
+}
 .right-4{
   right: 1rem;
 }
@@ -1700,14 +1703,11 @@ body{
 .top-2{
   top: 0.5rem;
 }
-.top-7{
-  top: 1.75rem;
-}
-.right-3{
-  right: 0.75rem;
-}
 .top-3{
   top: 0.75rem;
+}
+.top-7{
+  top: 1.75rem;
 }
 .z-0{
   z-index: 0;
@@ -1875,9 +1875,6 @@ body{
 }
 .max-w-sm{
   max-width: 24rem;
-}
-.shrink{
-  flex-shrink: 1;
 }
 .shrink-0{
   flex-shrink: 0;
@@ -2067,6 +2064,9 @@ body{
 .bg-black\/40{
   background-color: rgb(0 0 0 / 0.4);
 }
+.bg-black\/50{
+  background-color: rgb(0 0 0 / 0.5);
+}
 .bg-black\/60{
   background-color: rgb(0 0 0 / 0.6);
 }
@@ -2105,9 +2105,6 @@ body{
 }
 .bg-white\/5{
   background-color: rgb(255 255 255 / 0.05);
-}
-.bg-black\/50{
-  background-color: rgb(0 0 0 / 0.5);
 }
 .bg-gradient-to-br{
   background-image: linear-gradient(to bottom right, var(--tw-gradient-stops));
@@ -2389,6 +2386,9 @@ body{
 .opacity-0{
   opacity: 0;
 }
+.opacity-100{
+  opacity: 1;
+}
 .opacity-25{
   opacity: 0.25;
 }
@@ -2397,9 +2397,6 @@ body{
 }
 .opacity-95{
   opacity: 0.95;
-}
-.opacity-100{
-  opacity: 1;
 }
 .shadow{
   --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
