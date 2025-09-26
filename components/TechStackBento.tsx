@@ -3,7 +3,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import TechRadar from "./TechRadar";
 import type { Project } from "./ProjectCard";
-import {useTranslations} from 'next-intl';
+import {useTranslations, useLocale} from 'next-intl';
+import { skillPercent as globalSkillPercent, roleSkills as defaultRoleSkills } from '@/lib/skills';
 
 /**
  * 中文（初学者友好）：
@@ -36,6 +37,10 @@ export default function TechStackBento({
   rolePalette?: Record<string, string>;
 }) {
   const tRadar = useTranslations('radar');
+  const locale = useLocale();
+  // 中文：若未从外部传入 roleSkills，则使用集中数据源 lib/skills.ts
+  // English: Fallback to centralized roleSkills if not provided via props
+  const effectiveRoleSkills: Record<string, string[]> | undefined = roleSkills || defaultRoleSkills;
   // 归一化别名，合并同义标签
   const aliasMap: Record<string, string> = useMemo(
     () => ({
@@ -63,30 +68,21 @@ export default function TechStackBento({
   );
 
   const { items, maxCount } = useMemo(() => {
-    const map = new Map<string, number>();
-    for (const p of projects) {
-      const list = (p.tags || []).map((t) => String(t).trim());
-      for (const raw of list) {
-        const k = raw.toLowerCase();
-        const normalized = aliasMap[k] || raw.replace(/\s+/g, " ").trim();
-        map.set(normalized, (map.get(normalized) || 0) + 1);
-      }
-    }
-    // 如果传入 roleSkills，则把其中的技能也加入集合（频次为空视为 1 次，只用于展示，不代表熟练度）。
-    if (roleSkills) {
-      for (const role of Object.keys(roleSkills)) {
-        for (const raw of roleSkills[role] || []) {
+    // 中文：仅使用集中定义的技能集合（lib/skills.ts），完全忽略 projects.tags，
+    //      这样你在 skills.ts 中的增删改会 100% 反映到前端。
+    // English: Use only centralized skills (lib/skills.ts), ignore projects.tags
+    const set = new Set<string>();
+    if (effectiveRoleSkills) {
+      for (const role of Object.keys(effectiveRoleSkills)) {
+        for (const raw of effectiveRoleSkills[role] || []) {
           const k = String(raw).trim();
-          if (!k) continue;
-          if (!map.has(k)) map.set(k, 1);
+          if (k) set.add(k);
         }
       }
     }
-    const arr = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
-    const limited = maxItems > 0 ? arr.slice(0, maxItems) : arr;
-    const max = limited.length ? limited[0][1] : 1;
-    return { items: limited, maxCount: max };
-  }, [projects, aliasMap, maxItems, roleSkills]);
+    const arr = Array.from(set.values()).map((name) => [name, 1] as [string, number]);
+    return { items: arr, maxCount: 1 };
+  }, [effectiveRoleSkills]);
 
   // 角色配色（与 Hero 徽章对应）
   const palette = useMemo<Record<string, string>>(() => ({
@@ -118,17 +114,19 @@ export default function TechStackBento({
    * English: Stable pseudo-random percentage (30%~80%) derived from skill name.
    */
   const getSkillPercent = (name: string): number => {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
-    return 30 + (hash % 51); // 30..80
+    // 中文：集中数据源 lib/skills.ts 中的 skillPercent 优先；未设置则为 1
+    // English: Prefer centralized skillPercent; fallback to 1 if unspecified
+    const v = (globalSkillPercent as Record<string, number>)[name];
+    if (v == null) return 1;
+    return Math.max(0, Math.min(100, v));
   };
 
   // 技能归属的角色
   const resolveRole = (skill: string): string | undefined => {
-    if (!roleSkills) return "Full-Stack Developer"; // 默认归入 Full-Stack Developer
+    if (!effectiveRoleSkills) return "Full-Stack Developer"; // 默认归入 Full-Stack Developer
     const key = skill.toLowerCase();
-    for (const role of Object.keys(roleSkills)) {
-      const list = roleSkills[role] || [];
+    for (const role of Object.keys(effectiveRoleSkills)) {
+      const list = effectiveRoleSkills[role] || [];
       if (list.some((s) => String(s).toLowerCase() === key)) return role;
     }
     // 未命中映射时，默认归入 Full-Stack Developer
@@ -175,16 +173,18 @@ export default function TechStackBento({
 
   // 计算角色→技能的字典（优先使用传入的 roleSkills，否则根据 tags 推断）
   const roleToSkills: Record<string, string[]> = useMemo(() => {
-    if (roleSkills) return roleSkills;
+    if (effectiveRoleSkills) return effectiveRoleSkills;
     const dict: Record<string, string[]> = {};
     for (const [name] of items) {
       const r = resolveRole(name) || "Full-Stack Developer";
       (dict[r] ||= []).push(name);
     }
     return dict;
-  }, [roleSkills, items]);
+  }, [effectiveRoleSkills, items]);
 
-  const rolesOrder = ["Web3 × AI", "Founder", "Full-Stack Developer", "Project Manager"]; 
+  // 中文：关于页标签的排列顺序：全栈开发者 → Web3 × AI → 项目经理 → 创始人
+  // English: Desired order on About page: Full-Stack → Web3 × AI → PM → Founder
+  const rolesOrder = ["Full-Stack Developer", "Web3 × AI", "Project Manager", "Founder"]; 
   const roleCounts: Record<string, number> = useMemo(() => {
     const res: Record<string, number> = {};
     for (const r of rolesOrder) res[r] = (roleToSkills[r] || []).length;
@@ -246,7 +246,17 @@ export default function TechStackBento({
               aria-pressed={tabRole === r}
             >
               <span className="pointer-events-none absolute inset-0 rounded-full opacity-0 transition-opacity duration-200 group-hover:opacity-100" style={{ boxShadow: `0 0 22px ${hexToRgba((hueColorMap[palette[r] || 'amber'] || '#22E1FF'), 0.55)}` }} aria-hidden />
-              {r}
+              {(() => {
+                // 中文：Web3 × AI 保持不变；其他在 zh 下使用中文标签
+                // English: Keep "Web3 × AI" as-is; localize others for zh
+                if (locale === 'zh') {
+                  if (r === 'Web3 × AI') return r;
+                  if (r === 'Founder') return '创始人';
+                  if (r === 'Full-Stack Developer') return '全栈开发';
+                  if (r === 'Project Manager') return '项目经理';
+                }
+                return r;
+              })()}
               <span className="ml-1 inline-block rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] align-middle">
                 {roleCounts[r] ?? 0}
               </span>
@@ -292,6 +302,30 @@ export default function TechStackBento({
             const maxRows = 2;
             const limit = isNarrow && !chipsExpanded ? cols * maxRows : displaySkills.length;
             const list = displaySkills.slice(0, limit);
+            const localizeSkill = (s: string): string => {
+              if (locale !== 'zh') return s;
+              // 仅在中文界面对非专业名词（Founder/PM 相关）进行直观中文化
+              // Only localize some non-technical items for zh UI
+              const map: Record<string, string> = {
+                'Product Design (Figma, Notion...)': '产品设计（Figma、Notion…）',
+                'Business Model Design': '商业模型设计',
+                'Ecosystem Partnerships': '生态合作伙伴',
+                'Team Management': '团队管理',
+                'Remote Collaboration': '远程协作',
+                'Rapid Iteration': '快速迭代',
+                'Demo Video Production': '演示视频制作',
+                'Pitch Deck': '路演稿（Pitch Deck）',
+                'Linear': 'Linear',
+                'Jira': 'Jira',
+                'Figma': 'Figma',
+                'Scrum Master': 'Scrum Master',
+                'Stakeholder Management': '干系人管理',
+                'Delivery governance': '交付治理',
+                'Analytics dashboards': '分析看板',
+                'User Feedback Loop': '用户反馈闭环',
+              };
+              return map[s] || s;
+            };
             return list.map((skill) => (
             <div
               key={skill}
@@ -300,7 +334,7 @@ export default function TechStackBento({
               title={skill}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate">{skill}</span>
+                <span className="truncate">{localizeSkill(skill)}</span>
                 {(() => {
                   const pct = getSkillPercent(skill);
                   return <span className="text-[10px] text-white/75 tabular-nums">{pct}%</span>;
@@ -346,52 +380,39 @@ export default function TechStackBento({
         <div className="rounded-2xl bg-white/5 p-3 ring-1 ring-white/10">
           {/* 标题：《能力图》/Skills Map */}
           <div className="mb-2 text-sm text-white/85">{tRadar('title')}</div>
-          <TechRadar
-            axes={[
-              'Frontend',
+          {(() => {
+            // 中文：只展示单一系列；轴顺序与强弱依次为：
+            // 前后端开发 → 项目管理 → 区块链 → 商务 → 数据与AI服务 → 基础设施与运维（数值递减）
+            // English: Single series only; axes order and descending strengths as specified
+            const axes = [
+              'Frontend & Backend',
+              'PM & Collaboration',
               'Blockchain',
+              'Business',
               'Data & AI Services',
               'Infra & DevOps',
-              'PM & Collaboration',
-              'Business',
-            ]}
-            displayAxes={[
-              tRadar('axes.frontend'),
-              tRadar('axes.blockchain'),
-              tRadar('axes.data'),
-              tRadar('axes.infra'),
-              tRadar('axes.pm'),
-              tRadar('axes.biz')
-            ]}
-            series={compareAll ? [
-              { label:'Web3 × AI', colorHex:'#10B981', values:{ Frontend:85, Blockchain:75, 'Data & AI Services':70, 'Infra & DevOps':60, 'PM & Collaboration':80, Business:65 } },
-              { label:'Founder', colorHex:'#F43F5E', values:{ Frontend:70, Blockchain:55, 'Data & AI Services':58, 'Infra & DevOps':52, 'PM & Collaboration':85, Business:82 } },
-              { label:'Full-Stack Developer', colorHex:'#F59E0B', values:{ Frontend:88, Blockchain:60, 'Data & AI Services':55, 'Infra & DevOps':65, 'PM & Collaboration':72, Business:60 } },
-              { label:'Project Manager', colorHex:'#6366F1', values:{ Frontend:68, Blockchain:52, 'Data & AI Services':56, 'Infra & DevOps':58, 'PM & Collaboration':92, Business:75 } },
-            ] : [
-              {
-                label: tabRole,
-                values: {
-                  Frontend: tabRole === "Full-Stack Developer" ? 88 : 85,
-                  Blockchain: tabRole === "Web3 × AI" ? 75 : 60,
-                  "Data & AI Services": tabRole === "Web3 × AI" ? 70 : 58,
-                  "Infra & DevOps": tabRole === "Full-Stack Developer" ? 65 : 55,
-                  "PM & Collaboration": tabRole === "Project Manager" ? 92 : 80,
-                  Business: tabRole === "Founder" ? 82 : 65,
-                },
-                colorHex:
-                  ({
-                    "Web3 × AI": "#10B981",
-                    Founder: "#F43F5E",
-                    "Full-Stack Developer": "#F59E0B",
-                    "Project Manager": "#6366F1",
-                  } as Record<string, string>)[tabRole] || "#22E1FF",
-              },
-            ]}
-            // 中文：在手机视口下自动收缩，避免 400x800 时溢出
-            // English: shrink on small viewport to avoid overflow at 400x800
-            size={340}
-          />
+            ];
+            const displayAxes = locale === 'zh'
+              ? ['前后端开发','项目管理','区块链','商务','数据与AI服务','基础设施与运维']
+              : axes;
+            const colorHex = ({
+              'Web3 × AI': '#10B981',
+              'Founder': '#F43F5E',
+              'Full-Stack Developer': '#F59E0B',
+              'Project Manager': '#6366F1',
+            } as Record<string, string>)[tabRole] || '#22E1FF';
+            const values = {
+              'Frontend & Backend': 90,
+              'PM & Collaboration': 80,
+              'Blockchain': 72,
+              'Business': 66,
+              'Data & AI Services': 60,
+              'Infra & DevOps': 55,
+            } as Record<string, number>;
+            return (
+              <TechRadar axes={axes} displayAxes={displayAxes} series={[{ label: tabRole, colorHex, values }]} size={340} />
+            );
+          })()}
         </div>
       )}
     </div>

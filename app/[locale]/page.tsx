@@ -5,6 +5,7 @@ import TechStackBento from '@/components/TechStackBento';
 import {Footer} from '@/components/Footer';
 import type {Project} from '@/components/ProjectCard';
 import {getMessages} from 'next-intl/server';
+import { roleSkills } from '@/lib/skills';
 
 export default async function HomePage({params}:{params:{locale:string}}) {
   const messages = await getMessages() as any;
@@ -74,20 +75,7 @@ export default async function HomePage({params}:{params:{locale:string}}) {
             projects={projects}
             maxItems={0}
             title="Skills"
-            roleSkills={{
-              'Web3 × AI': [
-                'Solidity','ERC4337','Hardhat','Ethers.js','Web3.js','DeFi (Swap, Staking, Yield Farming)','NFT Minting','Tokenomics','OpenAI API','Whisper API','Python Automation','Testnets','GitHub Actions','Docker','Vercel'
-              ],
-              'Founder': (messages?.about?.capabilities?.founder as string[]) || [
-                'Product Design (Figma, Notion, Flowchart)','Business Model Design','Ecosystem Partnerships','Hackathon Prototype Incubation','Team Management','Remote Collaboration','Rapid Iteration','Demo Video Production','Pitch Deck'
-              ],
-              'Full-Stack Developer': [
-                'React.js','Next.js','TypeScript','Tailwind CSS','Wagmi','Node.js','Python','Java','MongoDB','Redis','Zustand','React Query','Docker','GitHub Actions','Vercel','Ethers.js','Web3.js','Telegram API'
-              ],
-              'Project Manager': (messages?.about?.capabilities?.pm as string[]) || [
-                'Jira','Notion','Linear','Cross-region Remote Collaboration','Slack','Discord','Stakeholder Management','Delivery governance','Analytics dashboards','User Feedback Loop'
-              ]
-            }}
+            roleSkills={roleSkills}
           />
         </section>
       </main>
