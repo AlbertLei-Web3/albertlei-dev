@@ -45,11 +45,19 @@ export default function LocaleToggle() {
     const newPath = "/" + segments.join("/");
 
     const query = searchParams?.toString();
-    // #hash 只能在客户端读取；hash can only be read on client
+    // 中文：typedRoutes 不接受包含 hash 的字符串作为 Route；因此把 hash 分离，先只推送“路径+查询”，再单独设置 hash。
+    // English: typedRoutes rejects URLs containing hash; push pathname+query first, then set hash separately.
     const hash = typeof window !== "undefined" ? window.location.hash : "";
-    const url = query && query.length > 0 ? `${newPath}?${query}${hash}` : `${newPath}${hash}`;
+    const pathWithQuery = query && query.length > 0 ? `${newPath}?${query}` : `${newPath}`;
 
-    router.push(url as Route);
+    router.push(pathWithQuery as Route);
+    if (hash) {
+      // 中文：导航完成后再设置 hash，避免类型冲突
+      // English: Apply hash after navigation to avoid type constraint
+      setTimeout(() => {
+        try { if (typeof window !== 'undefined') window.location.hash = hash.substring(1); } catch {}
+      }, 0);
+    }
   }, [locale, pathname, searchParams, router]);
 
   return (
