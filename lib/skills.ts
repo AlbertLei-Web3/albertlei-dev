@@ -178,7 +178,6 @@ export const skillPercent: SkillPercent = {
   "X Layer": 50,
   "ERC-4626": 50,
   "OKX DEX SDK": 50,
-  "AI Agent": 68,
   "WebSocket": 50,
   "React 18": 50,
   "TailwindCSS": 50,
