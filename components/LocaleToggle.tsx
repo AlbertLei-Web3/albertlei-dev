@@ -1,6 +1,7 @@
 "use client";
 
 import React, {useCallback} from "react";
+import type { Route } from 'next';
 import {useLocale} from "next-intl";
 import {usePathname, useRouter, useSearchParams} from "next/navigation";
 
@@ -48,7 +49,7 @@ export default function LocaleToggle() {
     const hash = typeof window !== "undefined" ? window.location.hash : "";
     const url = query && query.length > 0 ? `${newPath}?${query}${hash}` : `${newPath}${hash}`;
 
-    router.push(url);
+    router.push(url as Route);
   }, [locale, pathname, searchParams, router]);
 
   return (
