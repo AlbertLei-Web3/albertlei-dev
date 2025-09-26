@@ -39,4 +39,5 @@ coverage/
 storybook-static/
 .turbo/
 
-video
+
+.next/

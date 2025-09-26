@@ -12,6 +12,7 @@
  * - Integrated ReactBits personalized navigation component
  */
 import { motion } from "framer-motion";
+import React, { useEffect, useRef, useState } from "react";
 import PillNav from "./PillNav";
 import {useTranslations, useLocale} from 'next-intl';
 import LocaleToggle from './LocaleToggle';
@@ -22,6 +23,26 @@ export function NavBar() {
   const tHero = useTranslations('hero');
   const locale = useLocale();
   const base = `/${locale}`; // 语言前缀 locale prefix
+
+  // Mobile 右上角语言切换器：根据滚动方向显示/隐藏
+  const [showMobileLocale, setShowMobileLocale] = useState<boolean>(true);
+  const lastYRef = useRef<number>(0);
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY || 0;
+      const last = lastYRef.current || 0;
+      if (y > last + 4) {
+        // 向下滚动：隐藏
+        setShowMobileLocale(false);
+      } else if (y < last - 4 || y <= 8) {
+        // 向上滚动或接近顶部：显示
+        setShowMobileLocale(true);
+      }
+      lastYRef.current = y;
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
     // 中文：使用 sticky + top-7 固定导航相对视口顶部 1.75rem，滚动时位置稳定
@@ -55,8 +76,15 @@ export function NavBar() {
           </div>
         </div>
 
-        {/* Mobile: 简洁底部导航条（固定底部） */}
+        {/* Mobile: 顶部右上角语言切换器（滚动下滑隐藏，上滑显示） */}
         <div className="sm:hidden">
+          <div
+            className={`fixed right-3 top-3 z-50 transition-transform duration-200 ${showMobileLocale ? 'translate-y-0 opacity-100' : '-translate-y-5 opacity-0 pointer-events-none'}`}
+          >
+            <LocaleToggle />
+          </div>
+
+          {/* 简洁底部导航条（固定底部） */}
           <nav className="fixed inset-x-0 bottom-3 z-40 mx-auto w-[92%] rounded-2xl border border-white/10 bg-black/30 backdrop-blur-md px-3 py-2 shadow-[0_0_18px_rgba(34,225,255,0.25)]">
             <ul className="grid grid-cols-4 text-[12px] font-semibold text-white/90">
               {[

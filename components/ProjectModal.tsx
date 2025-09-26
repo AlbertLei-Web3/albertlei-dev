@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import type { Project } from "./ProjectCard";
 import {useTranslations, useMessages} from 'next-intl';
 
@@ -33,6 +33,16 @@ export default function ProjectModal({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
+
+  const [showMedia, setShowMedia] = useState<boolean>(false);
+
+  // 当弹窗打开/关闭时重置播放就绪状态
+  // Reset media mount state when modal opens/closes
+  useEffect(() => {
+    if (!open) {
+      setShowMedia(false);
+    }
+  }, [open]);
 
   if (!open) return null;
 
@@ -72,15 +82,41 @@ export default function ProjectModal({
 
         {/* Body */}
         <div className="grid gap-4 p-4 md:grid-cols-5 overflow-y-auto">
-          {/* Media placeholder + manual play */}
+          {/* Media placeholder + manual play (二次点击才挂载媒体) */}
           <div className="md:col-span-3">
-            {project.mediaType === "video" ? (
+            {!showMedia ? (
+              <button
+                type="button"
+                onClick={() => setShowMedia(true)}
+                className="group relative aspect-[16/9] w-full overflow-hidden rounded-lg border border-white/10 bg-black/40"
+                aria-label="Play video"
+              >
+                {project.poster ? (
+                  <img
+                    src={project.poster}
+                    alt={project.title}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-white/10 to-white/5" />
+                )}
+                <div className="absolute inset-0 grid place-items-center">
+                  <div className="rounded-full border border-white/20 bg-black/50 p-4 backdrop-blur group-hover:scale-110 transition-transform">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-white/95">
+                      <path d="M8 5v14l11-7z" fill="currentColor"/>
+                    </svg>
+                  </div>
+                </div>
+              </button>
+            ) : project.mediaType === "video" ? (
               <video
                 src={project.mediaSrc}
                 poster={project.poster}
                 controls
                 playsInline
-                preload="metadata"
+                preload="none"
+                autoPlay
                 className="aspect-[16/9] w-full rounded-lg border border-white/10 bg-black/40 object-cover"
               />
             ) : (
